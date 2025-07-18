@@ -17,11 +17,10 @@ def get_controller() -> UsersController:
     controller: UsersController = Container.resolve("users_controller") 
     return controller
 
-@router.post("/verified/create", status_code=201, dependencies=[Depends(security)])
+@router.post("/verified/create", status_code=201)
 def verified_create(
     request: Request,
     data: UserCreate = Body(...),
-    _=Depends(verified_middleware),
     db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_controller)
     
