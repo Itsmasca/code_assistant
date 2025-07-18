@@ -9,7 +9,10 @@ from src.service.Qdrant import retrieve
 
 load_dotenv
 ### Anthropic
-
+class input(BaseModel):
+    agentName: str = Field(description="Name of the agent")
+    improvedPrompt: Optional[str] = Field(default=None, description="Improved prompt for the agent")
+    agentJson: Optional[Any] = Field( default=None, description="JSON configuration of the agent")
 
 class code(BaseModel):
     """Schema for code solutions to questions about LCEL."""
@@ -23,18 +26,6 @@ class Llmservice:
         self.llm = ChatAnthropic(temperature=0.3, model="claude-3-opus-20240229", api_key= os.getenv("ANTHROPIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"})
         self.question = "Please build the webpage of the agent with the agent specification to have all the inputs to assure the agent are working as good as possible"
         self.structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
-        self.code_chain_claude_raw = (
-    self.code_gen_prompt | self.structured_llm_claude | self.check_claude_output
-)
-        self. solution = self.code_chain_claude_raw.invoke(
-            {
-                "context": concatenated_content,
-                "agentName": "",
-                "improvedPrompt": "",
-                "agentJson": Any,
-                "messages": [("user", self.question)]
-            }
-        )
         self.code_gen_prompt = ChatPromptTemplate.from_messages(
     [
         (
