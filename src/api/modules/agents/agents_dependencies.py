@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
-from core.dependencies.container import Container
-from core.repository.base_repository import BaseRepository
-from core.logs.logger import Logger
-from core.services.http_service import HttpService
-from modules.agents.agents_controller import AgentsController
-from modules.agents.agents_service import AgentsService
-from modules.agents.agents_models import Agent
+from api.core.dependencies.container import Container
+from api.core.repository.base_repository import BaseRepository
+from api.core.logs.logger import Logger
+from api.core.services.http_service import HttpService
+from api.modules.agents.agents_controller import AgentsController
+from api.modules.agents.agents_service import AgentsService
+from api.modules.agents.agents_models import Agent
 def configure_agents_dependencies(logger: Logger):
     repository = BaseRepository(model=Agent)
     http_service: HttpService = Container.resolve("http_service")

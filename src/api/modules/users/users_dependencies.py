@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
-from core.dependencies.container import Container
-from core.repository.base_repository import BaseRepository
-from core.logs.logger import Logger
-from modules.users.users_models import User
-from core.services.http_service import HttpService
-from modules.users.users_service import UsersService
-from modules.users.users_controller import UsersController
+from api.core.dependencies.container import Container
+from api.core.repository.base_repository import BaseRepository
+from api.core.logs.logger import Logger
+from api.modules.users.users_models import User
+from api.core.services.http_service import HttpService
+from api.modules.users.users_service import UsersService
+from api.modules.users.users_controller import UsersController
 
 def configure_users_dependencies(logger: Logger):
     repository = BaseRepository(model=User)

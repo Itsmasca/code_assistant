@@ -1,12 +1,12 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
-from core.dependencies.container import Container
-from core.middleware.auth_middleware import auth_middleware
-from core.middleware.verified_middleware import verified_middleware
-from modules.users.users_controller import UsersController
-from modules.users.users_models import UserCreate, UserUpdate, UserLogin, UserPublic
+from api.core.dependencies.container import Container
+from api.core.middleware.auth_middleware import auth_middleware
+from api.core.middleware.verified_middleware import verified_middleware
+from api.modules.users.users_controller import UsersController
+from api.modules.users.users_models import UserCreate, UserUpdate, UserLogin, UserPublic
 from sqlalchemy.orm import Session
-from core.database.sessions import get_db_session
-from core.middleware.middleware_service import security
+from api.core.database.sessions import get_db_session
+from api.core.middleware.middleware_service import security
 
 router = APIRouter(
     prefix="/users",

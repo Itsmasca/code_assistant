@@ -1,8 +1,8 @@
-from core.services.encryption_service import EncryptionService
-from core.services.hashing_service import HashingService
-from core.services.request_validation_service import RequestValidationService
-from core.services.webtoken_service import WebTokenService
-from core.logs.logger import Logger
+from api.core.services.encryption_service import EncryptionService
+from api.core.services.hashing_service import HashingService
+from api.core.services.request_validation_service import RequestValidationService
+from api.core.services.webtoken_service import WebTokenService
+from api.core.logs.logger import Logger
 
 class HttpService:
     def __init__(

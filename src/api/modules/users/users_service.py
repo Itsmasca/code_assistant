@@ -1,13 +1,13 @@
-from modules.users.users_models import UserPublic, User, UserUpdate, UserPrivate
-from core.repository.base_repository import BaseRepository
-from core.dependencies.container import Container
-from core.services.encryption_service import EncryptionService
+from api.modules.users.users_models import UserPublic, User, UserUpdate, UserPrivate
+from api.core.repository.base_repository import BaseRepository
+from api.core.dependencies.container import Container
+from api.core.services.encryption_service import EncryptionService
 import logging
-from core.logs.logger import Logger
+from api.core.logs.logger import Logger
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 from uuid import UUID
-from core.decorators.service_error_handler import service_error_handler
+from api.core.decorators.service_error_handler import service_error_handler
 
 class UsersService():
     _MODULE = "users.service" 

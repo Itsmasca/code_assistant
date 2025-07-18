@@ -1,8 +1,8 @@
-from modules.users.users_service import UsersService
-from modules.users.users_models import UserCreate, User, UserUpdate, UserLogin
+from api.modules.users.users_service import UsersService
+from api.modules.users.users_models import UserCreate, User, UserUpdate, UserLogin
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException
 from fastapi.responses import JSONResponse
-from core.services.http_service import HttpService
+from api.core.services.http_service import HttpService
 import logging
 from sqlalchemy.orm import Session
 

@@ -1,12 +1,13 @@
-from core.services.webtoken_service import WebTokenService
-from core.middleware.middleware_service import MiddlewareService
-from core.dependencies.container import Container
-from core.services.encryption_service import EncryptionService
-from core.logs.logger import Logger
-from core.services.hashing_service import HashingService
-from core.services.request_validation_service import RequestValidationService
-from core.services.http_service import HttpService
-from modules.users.users_dependencies import configure_users_dependencies
+from api.core.services.webtoken_service import WebTokenService
+from api.core.middleware.middleware_service import MiddlewareService
+from api.core.dependencies.container import Container
+from api.core.services.encryption_service import EncryptionService
+from api.core.logs.logger import Logger
+from api.core.services.hashing_service import HashingService
+from api.core.services.request_validation_service import RequestValidationService
+from api.core.services.http_service import HttpService
+from api.modules.users.users_dependencies import configure_users_dependencies
+from api.modules.agents.agents_dependencies import configure_agents_dependencies
 
 def configure_container():
     # core   
@@ -41,6 +42,9 @@ def configure_container():
 
     # users 
     configure_users_dependencies(logger=logger)
+
+    # agents 
+    configure_agents_dependencies(logger=logger)
 
 
 

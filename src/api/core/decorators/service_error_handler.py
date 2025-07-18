@@ -2,7 +2,7 @@
 from functools import wraps
 import logging
 from typing import Callable, Any
-from core.logs.logger import Logger
+from api.core.logs.logger import Logger
 
 def service_error_handler(module: str) -> Callable:
     def decorator(func: Callable) -> Callable:
