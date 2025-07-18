@@ -1,49 +1,66 @@
-from modules.users.users_models import UserPublic, User, UserUpdate, UserPrivate
-from core.repository.base_repository import BaseRepository
+from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
 from core.dependencies.container import Container
-from core.services.encryption_service import EncryptionService
-import logging
-from core.logs.logger import Logger
-from typing import Dict, Any
+from core.middleware.auth_middleware import auth_middleware
+from core.middleware.verified_middleware import verified_middleware
+from modules.users.users_controller import UsersController
+from modules.users.users_models import UserCreate, UserUpdate, UserLogin, UserPublic
 from sqlalchemy.orm import Session
-from uuid import UUID
-from core.decorators.service_error_handler import service_error_handler
+from core.database.sessions import get_db_session
+from core.middleware.middleware_service import security
 
-class UsersService():
-    _MODULE = "users.service" 
-    def __init__(self, logger: Logger, repository: BaseRepository):
-        self._repository = repository
-        self._logger = logger
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"]
+)
 
-    @service_error_handler(module=_MODULE)
-    def create(self, db: Session, user: UserPrivate) -> UserPublic:
-        return self._repository.create(db, self.__map_to_db(user))
+def get_controller() -> UsersController:
+    controller: UsersController = Container.resolve("users_controller") 
+    return controller
 
-    @service_error_handler(module=_MODULE)
-    def resource(self, db: Session, where_col: str, identifier: str | UUID) -> User | None:
-        return self._repository.get_one(db, where_col, identifier)
+@router.post("/verified/create", status_code=201, dependencies=[Depends(security)])
+def verified_create(
+    request: Request,
+    data: UserCreate = Body(...),
+    _=Depends(verified_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+    
+):
+    return controller.create_request(request=request, db=db, new_user=data)
 
-    @service_error_handler("users.service")
-    def update(self, db: Session, user_id: UUID, changes: UserUpdate) -> UserPublic:
-        return self.map_from_db(self._repository.update(db, key="user_id", value=user_id, changes=changes))
+@router.get("/secure/resource", status_code=200, response_model=UserPublic, dependencies=[Depends(security)])
+def secure_resource(
+    request: Request,
+    _=Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    return controller.resource_request(request=request)
 
-    @service_error_handler(module=_MODULE)
-    def delete(self, db: Session, user_id: UUID) -> UserPublic:
-        return self.map_from_db(self._repository.delete(db, key="user_id", value=user_id))
+@router.put("/secure/update", status_code=200, dependencies=[Depends(security)])
+def secure_update(
+    request: Request,
+    data: UserUpdate = Body(...),
+    _=Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    return controller.update_request(request=request, db=db, data=data)
 
-    @staticmethod
-    def __map_to_db(user: UserPrivate) -> User:
-        encryption_service: EncryptionService = Container.resolve("encryption_service")
-        return User(
-            email=encryption_service.encrypt(user["email"]),
-            email_hash=user["email_hash"],
-            password=user["password"]
-        )
+@router.delete("/secure/delete", status_code=200, dependencies=[Depends(security)])
+def secure_delete(
+    request: Request,
+    _=Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    return controller.delete_request(request=request, db=db)
 
-    @staticmethod
-    def map_from_db(user: User) -> UserPublic:
-        encryption_service: EncryptionService = Container.resolve("encryption_service")
-        return UserPublic(
-            userId=str(user.user_id),
-            email=encryption_service.decrypt(user.email)
-        )
+@router.post("/login", status_code=200)
+def login(
+    request: Request,
+    data: UserLogin = Body(...),
+    db: Session = Depends(get_db_session),
+    controller: UsersController = Depends(get_controller)
+):
+    return controller.login(request=request, db=db, data=data)
