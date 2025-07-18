@@ -7,3 +7,6 @@ class GraphState(TypedDict):
     messages: List
     generation: str
     iterations: int
+    agentName: str
+    improvedPrompt: str
+    agentJson: str

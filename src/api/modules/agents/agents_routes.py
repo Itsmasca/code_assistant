@@ -19,6 +19,20 @@ router = APIRouter(
 def get_controller():
     return Container.resolve("agents_controller")
 
+@router.post("/run-agent-graph")
+def run_agent_graph(request: Request, data: dict = Body(...)):
+    # Prepara el estado inicial (ajusta según tus necesidades)
+    initial_state = {
+        "messages": data.get("messages", []),
+        "iterations": 0,
+        "error": "no",
+        "agentName": data.get("agentName", "DefaultAgent"),
+        "improvedPrompt": data.get("improvedPrompt", ""),
+        "agentJson": data.get("agentJson", "{}")
+    }
+    # Ejecuta el grafo
+    result = app.invoke(initial_state)
+    return result
 
 @router.post("/secure/create", status_code=201)
 def secure_create(

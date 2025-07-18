@@ -147,8 +147,9 @@ class Llmservice:
 
         return solution["parsed"]
 
-    def retrieve_chain(self):
+    def retrieve_chain(self, improved_prompt: Optional[str] = None) -> ChatPromptTemplate:
         # Chain with output check
+        self.set_question(improved_prompt or self.question)
         code_chain_claude_raw = (
         self.code_gen_prompt | self.structured_llm_claude | self.check_claude_output
         )

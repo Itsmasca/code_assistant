@@ -31,6 +31,9 @@ def generate(state: GraphState):
     messages = state["messages"]
     iterations = state["iterations"]
     error = state["error"]
+    agent_name = state["agentName"]
+    improved_prompt = state["improvedPrompt"]
+    agent_json = state["agentJson"]
 
     # We have been routed back to generation with an error
     if error == "yes":
@@ -40,13 +43,13 @@ def generate(state: GraphState):
                 "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
             )
         ]
-    code_gen_chain = Llmservice.retrieve_chain()
+    code_gen_chain = Llmservice.retrieve_chain(improved_prompt)
     # Solution
     code_solution = code_gen_chain.invoke(
         {"context": concatenated_content, 
-         "agnetName": state["agentName"],
-         "improvedPrompt": state["improvedPrompt"],
-         "agentJson": state["agentJson"],
+         "agnetName": agent_name,
+         "improvedPrompt": improved_prompt,
+         "agentJson": agent_json,
          "messages": messages}
     )
     messages += [

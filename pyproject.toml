@@ -24,3 +24,5 @@ dependencies = [
     "typing-extensions>=4.14.1",
 ]
 
+[tool.poetry.dependencies]
+psycopg2-binary = "^2.9"
