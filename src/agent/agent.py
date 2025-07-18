@@ -144,9 +144,13 @@ def reflect(state: GraphState):
     # Prompt reflection
 
     # Add reflection
-
+    code_gen_chain = Llmservice.retrieve_chain()
     reflections = code_gen_chain.invoke(
-        {"context": concatenated_content, "messages": messages}
+        {"context": concatenated_content, 
+         "agnetName": state["agentName"],
+         "improvedPrompt": state["improvedPrompt"],
+         "agentJson": state["agentJson"],
+         "messages": messages}
     )
     messages += [("assistant", f"Here are reflections on the error: {reflections}")]
     return {"generation": code_solution, "messages": messages, "iterations": iterations}
