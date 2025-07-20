@@ -1,13 +1,13 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
-from api.core.dependencies.container import Container
+from src.api.core.dependencies.container import Container
 from typing import List
-from api.core.middleware.auth_middleware import auth_middleware
+from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
-from api.core.database.sessions import get_db_session
-from api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic
-from api.modules.agents.agents_controller import AgentsController
+from src.api.core.database.sessions import get_db_session
+from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic
+from src.api.modules.agents.agents_controller import AgentsController
 import uuid
-from api.core.middleware.middleware_service import security
+from src.api.core.middleware.middleware_service import security
 
 
 router = APIRouter(

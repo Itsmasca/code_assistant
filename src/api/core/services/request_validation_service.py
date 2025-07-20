@@ -1,7 +1,7 @@
 import uuid
 from fastapi import HTTPException
 from typing import List, Dict, Any
-from api.core.dependencies.container import Container
+from src.api.core.dependencies.container import Container
 from sqlalchemy.orm import Session
 import uuid
 

@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from api.core.database.db_models import Base 
+from src.api.core.database.db_models import Base 
 import uuid
 
 
