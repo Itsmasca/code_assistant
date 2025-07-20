@@ -1,7 +1,7 @@
 ### Parameter
 from langgraph.graph import END, StateGraph, START
 from src.agent.state import GraphState
-from src.service.Llm_service import Llmservice, Input
+from src.service.Llm_service import Llmservice
 from src.service.LCEL_langchain import concatenated_content
 
 # Max tries

@@ -1,11 +1,10 @@
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
-from src.service.LCEL_langchain import concatenated_content
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 import os
 from typing import Any, Optional
-from src.service.Qdrant import retrieve
+from src.service.Qdrant import QdrantRetriever
 
 load_dotenv
 ### Anthropic
@@ -22,6 +21,7 @@ class Llmservice:
         self.llm = ChatAnthropic(temperature=0.3, model="claude-3-opus-20240229", api_key= os.getenv("ANTHROPIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"})
         self.question = "Please build the webpage of the agent with the agent specification to have all the inputs to assure the agent are working as good as possible"
         self.structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
+        self.retriever = QdrantRetriever()
         self.code_gen_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -32,7 +32,7 @@ class Llmservice:
             defined. Structure your answer: 1) a prefix describing the code solution, 2) the imports, 3) the functioning code block. \n
             Invoke the code tool to structure the output correctly. </instructions> \n Here is the user question:""",
             "system",
-            """Generate a complete Next.js React component for a dynamic agent interface based on this agent specification:
+            r"""Generate a complete Next.js React component for a dynamic agent interface based on this agent specification:
 
             Agent Name: ${agentName or 'Custom Agent'}
             Agent ID: ${agentName or 'Custom Agent'} (use this as the agentId when calling /api/ask-agent)
@@ -63,10 +63,9 @@ class Llmservice:
 
             """,
                 "user",
-                """
-                Example implementation (as a string, not real code!):
+            r"""
+            Example implementation (as a string, not real code!):
 
-            \`\`\`ts
             // pages/api/ask-agent.ts
             import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -92,16 +91,15 @@ class Llmservice:
             const data = await nsRes.json();
             return res.status(200).json(data);
             }
-            \`\`\`
                 """
                     ),
                     ("placeholder", "{messages}"),
                 ]
             )
-    def get_context(self):
+    def get_context(self, query: str) -> Any:
         """Returns the concatenated context from Qdrant."""
-        concatenated_content = retrieve()
-        return concatenated_content
+        context = self.retriever.retrieve(query)
+        return context
     def set_question(self, question: str):
         """Sets the question for the code generation."""
         self.question = question
