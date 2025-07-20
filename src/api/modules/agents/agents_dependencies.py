@@ -14,7 +14,7 @@ def configure_agents_dependencies(logger: Logger):
         repository=repository
     )
     controller = AgentsController(
-        https_service=http_service,
+        http_service=http_service,
         agents_service= service
     )
 
