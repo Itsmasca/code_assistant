@@ -1,4 +1,4 @@
-from src.api.modules.agents.agents_models import Agent, AgentCreate, AgentPublic, AgentPrivate, AgentUpdate
+from src.api.modules.agents.agents_models import Agent, AgentCreate, AgentPublic, AgentToDB, AgentUpdate
 from src.api.core.repository.base_repository import BaseRepository
 import logging
 from src.api.core.logs.logger import Logger
@@ -14,8 +14,8 @@ class AgentsService():
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  agent: AgentPrivate) -> AgentPublic:
-        return self.__map_from_db(self._repository.create(db=db, data=self.__map_to_db(agent)))
+    def create(self, db: Session,  agent: AgentToDB) -> AgentPublic:
+        return self.__map_from_db(self._repository.create(db=db, data=self.__map_to_db(AgentToDB(**agent))))
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, agent_id: UUID) -> AgentPublic | None:
@@ -34,25 +34,21 @@ class AgentsService():
     
     @service_error_handler(module=_MODULE)
     def update(self, db: Session, agent_id: UUID, changes: Dict[str, Any]) -> AgentPublic:
-        return self.__map_from_db(self._repository.update(key="agent_id", value=agent_id, changes=changes))
+        return self.__map_from_db(self._repository.update(db=db, key="agent_id", value=agent_id, changes=changes))
 
     @service_error_handler(module=_MODULE)
     def delete(self, db: Session, agent_id: UUID)-> AgentPublic:
         return self.__map_from_db(self._repository.delete(db=db, key="agent_id", value=agent_id))
     
     @staticmethod
-    def __map_to_db(agent: AgentPrivate) -> Agent:
+    def __map_to_db(agent: AgentToDB) -> Agent:
         return Agent(
-            user_id=agent["userId"], 
+            user_id=agent.user_id, 
             agent_name=agent.agentName,
-            agent_description=agent.agentDescription
+            agent_prompt=agent.agentPrompt,
+            agent_json=agent.agentJson,
         )
-    
+
     @staticmethod
     def __map_from_db(agent: Agent) -> AgentPublic:
-        return AgentPublic(
-            agentId=agent.agent_id,
-            userId=agent.user_id,
-            agentName=agent.agent_name,
-            agentDescription=agent.agent_description
-        )
+        return AgentPublic.model_validate(agent)

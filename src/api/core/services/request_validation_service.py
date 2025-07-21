@@ -28,6 +28,7 @@ class RequestValidationService:
         
         return result
     
+    @staticmethod
     def validate_action_authorization(id: uuid.UUID, resource_id: uuid.UUID):
-        if id != resource_id:
+        if str(id) != str(resource_id):
             raise HTTPException(status_code=403, detail="Forbidden")

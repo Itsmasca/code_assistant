@@ -26,7 +26,7 @@ class UserPublic(BaseModel):
     userId: str
     email: EmailStr
 
-class UserPrivate(BaseModel):
+class UserToDB(BaseModel):
     email: EmailStr
     email_hash: str
     password: str

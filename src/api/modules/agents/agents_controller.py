@@ -44,7 +44,7 @@ class AgentsController:
 
         data = self._agents_service.collection(db=db, user_id=user.user_id)
 
-        {"data": data}
+        return  data
     
     def update_request(self, request: Request, db: Session, data: AgentUpdate, agent_id: uuid.UUID):
         user: User = request.state.user
@@ -54,12 +54,12 @@ class AgentsController:
             {"db": db, "agent_id": agent_id},
             "Agent not found"
         )
-
+        
         self._http_service.request_validation_service.validate_action_authorization(user.user_id, agent_resource.userId)
 
-        self._agents_service.update(db=db, agent_id=agent_resource.agentId, changes=data.model_dump())
+        self._agents_service.update(db=db, agent_id=agent_resource.agentId, changes=data.model_dump(exclude_unset=True))
 
-        return {"detail", "Agent updated"}
+        return {"detail": "Agent updated"}
     
     def delete_request(self, request: Request, db: Session, agent_id: uuid.UUID):
         user: User = request.state.user

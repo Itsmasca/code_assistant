@@ -1,4 +1,4 @@
-from src.api.modules.users.users_models import UserPublic, User, UserUpdate, UserPrivate
+from src.api.modules.users.users_models import UserPublic, User, UserUpdate, UserToDB
 from src.api.core.repository.base_repository import BaseRepository
 from src.api.core.dependencies.container import Container
 from src.api.core.services.encryption_service import EncryptionService
@@ -16,8 +16,8 @@ class UsersService():
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session, user: UserPrivate) -> UserPublic:
-        return self._repository.create(db, self.__map_to_db(user))
+    def create(self, db: Session, user: UserToDB) -> UserPublic:
+        return self._repository.create(db, self.__map_to_db(UserToDB(**user)))
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, where_col: str, identifier: str | UUID) -> User | None:
@@ -32,12 +32,12 @@ class UsersService():
         return self.map_from_db(self._repository.delete(db, key="user_id", value=user_id))
 
     @staticmethod
-    def __map_to_db(user: UserPrivate) -> User:
+    def __map_to_db(user: UserToDB) -> User:
         encryption_service: EncryptionService = Container.resolve("encryption_service")
         return User(
-            email=encryption_service.encrypt(user["email"]),
-            email_hash=user["email_hash"],
-            password=user["password"]
+            email=encryption_service.encrypt(user.email),
+            email_hash=user.email_hash,
+            password=user.password
         )
 
     @staticmethod

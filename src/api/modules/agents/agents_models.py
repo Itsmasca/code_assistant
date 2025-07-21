@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Any, Optional
+from pydantic import BaseModel, Field
+from typing import List, Any, Optional, Dict
 from sqlalchemy import Column, String, Text, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
 from src.api.core.database.db_models import Base
@@ -7,33 +7,37 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID, JSON
 
 
-class InteractionRequest(BaseModel):
-    conversationiId: str
-
-class LLMConfig(BaseModel):
-    prompt: str;
-    tools: List[Any];
-    max_tokens: int;
-    temperature: float
-
 class AgentCreate(BaseModel):
     agentName: str
-    agentDescription: Optional[str]
+    agentPrompt: str
+    agentJson: Dict
 
 class AgentPublic(BaseModel):
-    agentId: str
-    userId: str
-    agentName: str
-    agentDescription: Optional[str]
+    agentId: str = Field(..., alias="agent_id")
+    userId: str = Field(..., alias="user_id")
+    agentName: str = Field(..., alias="agent_name")
+    agentPrompt: str = Field(..., alias="agent_prompt")
+    agentJson: Dict = Field(..., alias="agent_json")
 
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True, 
+    }
+
+    
 class AgentUpdate(BaseModel):
-    agentName: Optional[str]
-    agentDescription: Optional[str]
+    agent_name: Optional[str] = Field(None, alias="agentName")
+    agent_prompt: Optional[str] = Field(None, alias="agentPrompt")
+    agent_json: Optional[str] = Field(None, alias="agentJson")
 
-class AgentPrivate(BaseModel):
-    user_id: str
+    class Config:
+        validate_by_name = True
+
+class AgentToDB(BaseModel):
+    user_id: uuid.UUID
     agentName: str
-    agentDescription: Optional[str]
+    agentPrompt: str
+    agentJson: Dict
 
 
 class Agent(Base):
