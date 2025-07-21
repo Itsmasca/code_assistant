@@ -10,7 +10,10 @@ import uuid
 from src.api.core.middleware.middleware_service import security
 from src.agent.agent import app as agent_graph
 
-≈
+
+
+
+
 
 
 router = APIRouter(
@@ -23,28 +26,6 @@ def get_controller():
     return Container.resolve("agents_controller")
 
 @router.post("/generate-code")
-def generate_code(request: Request, _=Depends(auth_middleware), data: dict = Body(...)):
-    initial_state = {
-        "messages": [],
-        "iterations": 0,
-        "error": "no",
-        "agentName": data.get("agentName", "DefaultAgent"),
-        "improvedPrompt": data.get("improvedPrompt", ""),
-        "agentJson": data.get("agentJson", {}),
-    }
-    result = agent_graph.invoke(initial_state)
-    return {
-        "code": getattr(result["generation"], "code", ""),
-        "imports": getattr(result["generation"], "imports", ""),
-        "prefix": getattr(result["generation"], "prefix", ""),
-        "messages": result.get("messages", []),
-        "agentName": result.get("agentName", ""),
-        "improvedPrompt": result.get("improvedPrompt", ""),
-        "agentJson": result.get("agentJson", {}),
-        "error": result.get("error", "no"),
-    }
-
-@router.post("/generate-code")
 def generate_code(request: Request, data: dict = Body(...)):
     initial_state = {
         "messages": [],
@@ -54,8 +35,7 @@ def generate_code(request: Request, data: dict = Body(...)):
         "improvedPrompt": data.get("improvedPrompt", ""),
         "agentJson": data.get("agentJson", {}),
     }
-    result = app.invoke(initial_state)
-    # Solo regresa el bloque de código generado y metadatos útiles
+    result = agent_graph.invoke(initial_state)
     return {
         "code": getattr(result["generation"], "code", ""),
         "imports": getattr(result["generation"], "imports", ""),
