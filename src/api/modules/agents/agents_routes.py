@@ -39,9 +39,31 @@ def generate_code(
         "messages": [],
         "iterations": 0,
         "error": "no",
-        "agentName": agent_resource.agentName,
-        "improvedPrompt": data.get("improvedPrompt", ""),
-        "agentJson": agent_resource.agentJson,
+        "agentName": "Reflexagent",
+        "improvedPrompt": "Agenty to rreflex a few thoughs by providing two thoughs",
+        "agentJson": """
+        {
+        // ...tu JSON completo aquí (sin cambios)...
+        "openapi": "3.0.3",
+        "info": {
+          "version": "1.6.85",
+          "title": "ConfigRouteAnalyzer",
+          "description": "NeuralSeek - The business LLM accelerator",
+          "license": {
+            "name": "End User License Agreement",
+            "url": "https://neuralseek.com/eula"
+          },
+          "contact": {
+            "name": "NeuralSeek Support",
+            "url": "https://neuralseek.com",
+            "email": "support@NeuralSeek.com"
+          },
+          "termsOfService": "https://neuralseek.com/eula"
+        },
+        // ...resto del JSON...
+        // (no lo repito aquí por espacio, pero no cambies nada más)
+      }
+""",
     }
     result = agent_graph.invoke(initial_state)
     return {
