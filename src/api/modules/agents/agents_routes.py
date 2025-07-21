@@ -8,12 +8,6 @@ from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, Agent
 from src.api.modules.agents.agents_controller import AgentsController
 import uuid
 from src.api.core.middleware.middleware_service import security
-from src.agent.agent import app as agent_graph
-
-
-
-
-
 
 
 router = APIRouter(
@@ -27,6 +21,7 @@ def get_controller():
 
 @router.post("/generate-code")
 def generate_code(request: Request, data: dict = Body(...)):
+    from src.agent.agent import app as agent_graph  # <-- Importa aquí, dentro de la función
     initial_state = {
         "messages": [],
         "iterations": 0,

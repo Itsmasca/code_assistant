@@ -28,9 +28,9 @@ class Llmservice:
         ("user", r"Example implementation (as a string, not real code!):\n// pages/api/ask-agent.ts\nimport type {{ NextApiRequest, NextApiResponse }} from 'next';\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {{\nif (req.method !== 'POST') {{\nreturn res.status(405).json({{ error: 'Method not allowed' }});\n}}\nconst {{ query, agentId }} = req.body;\nif (!query || !agentId) {{\nreturn res.status(400).json({{ error: 'Missing query or agentId' }});\n}}\nconst nsRes = await fetch(\n\"https://stagingapi.neuralseek.com/v1/liam-demo/{agentId}/maistro\",\n{{\nmethod: 'POST',\nheaders: {{\n'Content-Type': 'application/json',\n'apikey': process.env.NEURALSEEK_API_KEY!,\n}},\nbody: JSON.stringify({{ params: {{ use_case_summary: query }} }}),\n}}\n);\nconst data = await nsRes.json();\nreturn res.status(200).json(data);\n}}"),
         ("placeholder", "{messages}")
 ])
-    def get_context(self, query: str) -> Any:
+    def get_context(self, query: str, vectorbase: QdrantRetriever) -> Any:
         """Returns the concatenated context from Qdrant."""
-        context = self.retriever.retrieve(query)
+        context = vectorbase.retrieve(query)
         return context
     def set_question(self, question: str):
         """Sets the question for the code generation."""
