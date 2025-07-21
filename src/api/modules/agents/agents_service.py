@@ -15,7 +15,7 @@ class AgentsService():
 
     @service_error_handler(module=_MODULE)
     def create(self, db: Session,  agent: AgentToDB) -> AgentPublic:
-        return self.__map_from_db(self._repository.create(db=db, data=self.__map_to_db(AgentToDB(**agent))))
+        return self.__map_from_db(self._repository.create(db=db, data=Agent(**agent.model_dump(by_alias=False))))
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, agent_id: UUID) -> AgentPublic | None:
@@ -40,10 +40,6 @@ class AgentsService():
     def delete(self, db: Session, agent_id: UUID)-> AgentPublic:
         return self.__map_from_db(self._repository.delete(db=db, key="agent_id", value=agent_id))
     
-    @staticmethod
-    def __map_to_db(agent: AgentToDB) -> Agent:
-        return Agent.model_validate(agent)
-
     @staticmethod
     def __map_from_db(agent: Agent) -> AgentPublic:
         return AgentPublic.model_validate(agent)

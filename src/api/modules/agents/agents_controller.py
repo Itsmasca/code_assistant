@@ -1,6 +1,6 @@
 from src.api.core.services.http_service import HttpService
 from src.api.modules.agents.agents_service import AgentsService
-from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate
+from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate, AgentToDB
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException, params
 from fastapi.responses import JSONResponse
 from src.api.core.services.http_service import HttpService
@@ -22,7 +22,7 @@ class AgentsController:
             "userId": user.user_id
         }
 
-        self._agents_service.create(db=db, agent=agent_data)
+        self._agents_service.create(db=db, agent=AgentToDB(**agent_data))
 
         return {"detail": "Agent created"}
     

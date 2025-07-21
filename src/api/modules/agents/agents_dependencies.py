@@ -6,6 +6,7 @@ from src.api.core.services.http_service import HttpService
 from src.api.modules.agents.agents_controller import AgentsController
 from src.api.modules.agents.agents_service import AgentsService
 from src.api.modules.agents.agents_models import Agent
+
 def configure_agents_dependencies(logger: Logger):
     repository = BaseRepository(model=Agent)
     http_service: HttpService = Container.resolve("http_service")
