@@ -8,7 +8,11 @@ from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, Agent
 from src.api.modules.agents.agents_controller import AgentsController
 import uuid
 from src.api.core.middleware.middleware_service import security
+<<<<<<< HEAD
 from src.agent.agent import app as agent_graph
+=======
+
+>>>>>>> c0a151f05385b7daabca88c4297547d1afb98b70
 
 router = APIRouter(
     prefix="/agents",
@@ -20,7 +24,8 @@ def get_controller():
     return Container.resolve("agents_controller")
 
 @router.post("/generate-code")
-def generate_code(request: Request, _=Depends(auth_middleware), data: dict = Body(...)):
+def generate_code(request: Request, data: dict = Body(...)):
+    from src.agent.agent import app as agent_graph  # <-- Importa aquí, dentro de la función
     initial_state = {
         "messages": [],
         "iterations": 0,
@@ -41,6 +46,7 @@ def generate_code(request: Request, _=Depends(auth_middleware), data: dict = Bod
         "error": result.get("error", "no"),
     }
 
+<<<<<<< HEAD
 @router.post("/generate-code")
 def generate_code(request: Request, data: dict = Body(...)):
     initial_state = {
@@ -64,6 +70,8 @@ def generate_code(request: Request, data: dict = Body(...)):
         "error": result.get("error", "no"),
     }
 
+=======
+>>>>>>> c0a151f05385b7daabca88c4297547d1afb98b70
 @router.post("/secure/create", status_code=201)
 def secure_create(
     requset: Request,
