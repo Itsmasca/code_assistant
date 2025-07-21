@@ -10,9 +10,6 @@ import uuid
 from src.api.core.middleware.middleware_service import security
 from src.agent.agent import app as agent_graph
 
-≈
-
-
 router = APIRouter(
     prefix="/agents",
     tags=["Agent"],
@@ -54,7 +51,7 @@ def generate_code(request: Request, data: dict = Body(...)):
         "improvedPrompt": data.get("improvedPrompt", ""),
         "agentJson": data.get("agentJson", {}),
     }
-    result = app.invoke(initial_state)
+    result = agent_graph.invoke(initial_state)
     # Solo regresa el bloque de código generado y metadatos útiles
     return {
         "code": getattr(result["generation"], "code", ""),

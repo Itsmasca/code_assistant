@@ -1,10 +1,3 @@
-import sys
-from pathlib import Path
-
-# 👇 Add this before importing anything from src.*
-root = Path(__file__).resolve().parents[4]  # This should point to your root project directory
-sys.path.insert(0, str(root))
-
 import pytest
 from fastapi.testclient import TestClient
 from dotenv import load_dotenv
@@ -16,15 +9,29 @@ load_dotenv()
 
 client = TestClient(app)
 
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjc1ZDI1NTktZmE0Ny00MDJkLThjMTYtZTViNmUyYjg4YWNmIiwiZXhwIjoxNzgzNTQzODc2fQ.3RG3A1wap_KZ6esSQelQLBSF0id6Bg91t2bx1vc13TA"
-verified_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJpZmljYXRpb25fY29kZSI6MTIzNDU2LCJleHAiOjE3ODM1MzUxNjN9.xguVx4s8wesOlDeq1Lu4VTV2R1r9GGgJWUo9WfYNOYc"
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmU4YTE4OTYtZTRlMS00N2RjLTkxM2UtZTM5ZWE0MGU1ODI3IiwiZXhwIjoxNzg0NjUzOTgxfQ.wk_sVAV-44BFvbnKfte4yqnzbNXOrzXvgD8DAXvnzng"
+verified_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJpZmljYXRpb25fY29kZSI6MTIzNDU2LCJleHAiOjE3ODQ2NTM4OTB9.FAEmnOWH8BjH5Z6xU7he7vHbAuiS8zAY4gnYFWePRYI"
 delete_token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTEwMDA0YWUtY2IxYi00NjIzLTk4MDgtMTMxYWUzYjE4MmExIiwiZXhwIjoxNzgzNTQwMDkwfQ.P0olLSoCpnDlTFYk1VYMafes57hY2MvhG1eV8VfAGU4"
 
+# def test_verify_email_success():
+#     with TestClient(app) as client:
+#         payload = {
+#             "email": "brendan.soullens@gmail.com"
+#         }
+
+#         res = client.post("/users/verify-email",
+#             json=payload
+#         )
+
+#         print("verify email response:::.", res.json())
+
+#         assert res.status_code == 200
+#         assert "token" in res.json()
 
 def test_create_user_verified_success():
     with TestClient(app) as client:
         payload = {
-            "email": "user333333@example.com",
+            "email": "test1234555@example.com",
             "password": "password123",
             "code": "123456" 
         }
@@ -36,39 +43,12 @@ def test_create_user_verified_success():
         assert res.status_code == 201
         assert res.json()["detail"] == "User created"
 
-# def test_generate_code_success():
-#     payload = {
-#         "agentName": "testkike",
-#         "improvedPrompt": "Genera una función que sume dos números en Python.",
-#         "agentJson": {
-#             "openapi": "3.0.3",
-#             "info": {"title": "TestAgent", "version": "1.0"},
-#             "paths": {}
-#         }
-#     }
-#     response = client.post("/agents/generate-code", json=payload)
-#     assert response.status_code == 200
-#     data = response.json()
-#     assert "code" in data
-#     assert "imports" in data
-#     assert "prefix" in data
-#     assert data["agentName"] == "testkike"
-#     assert data["improvedPrompt"].startswith("Genera una función")
 
-# def test_generate_code_missing_fields():
-#     payload = {
-#         "agentName": "testkike"
-#         # Falta improvedPrompt y agentJson
-#     }
-#     response = client.post("/agents/generate-code", json=payload)
-#     assert response.status_code == 200
-#     data = response.json()
-#     assert "code" in data
     
 def test_create_user_verified_invalid_code():
     with TestClient(app) as client:
         payload = {
-            "email": "user@example.com",
+            "email": "user1234444@example.com",
             "password": "password123",
             "code": "123457" 
         }
@@ -85,22 +65,22 @@ def test_login_success():
    with TestClient(app) as client:
 
         payload = {
-            "email": "user@example.com",
-            "password": "newpass456"
+            "email": "test@example.com",
+            "password": "password123"
         }
 
         res = client.post("/users/login", json=payload)
+        print(res.json(), "LOGIN RESPONSE::::::::::")
         assert res.status_code == 200
         assert "token" in res.json()
 
-        AUTH_TOKEN = res.json()["token"]
-        assert AUTH_TOKEN is not None
+        
 
 def test_login_incorrect_password():
    with TestClient(app) as client:
 
         payload = {
-            "email": "user@example.com",
+            "email": "user333333@example.com",
             "password": "newpass456hhhhhhhhhhhh"
         }
 
@@ -117,7 +97,7 @@ def test_secure_resource():
         )
 
         assert res.status_code == 200
-        assert "data" in res.json()
+        assert "email" in res.json()
 
 
 # def test_update_user_password():

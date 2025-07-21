@@ -11,7 +11,8 @@ class UserCreate(BaseModel):
     password: str
     code: int
 
-
+class VerifyEmail(BaseModel):
+    email: EmailStr
 
 class UserLogin(BaseModel):
     email: EmailStr

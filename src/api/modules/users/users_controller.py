@@ -1,10 +1,11 @@
 from src.api.modules.users.users_service import UsersService
 from src.api.modules.users.users_models import UserCreate, User, UserUpdate, UserLogin
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException
-from fastapi.responses import JSONResponse
 from src.api.core.services.http_service import HttpService
 import logging
 from sqlalchemy.orm import Session
+from src.api.core.dependencies.container import Container
+from src.api.core.services.email_service import EmailService
 
 class UsersController:
     def __init__(self, https_service: HttpService, users_service: UsersService):
@@ -14,12 +15,21 @@ class UsersController:
 
 
     def verify_email(self, request: Request, db: Session, email: str):
+        print("In Verified email")
         hashed_email = self._http_service.hashing_service.hash_for_search(data=email)
         
         email_in_use: User = self._users_service.resource(db=db, where_col="email_hash", identifier=hashed_email)
 
         if email_in_use:
             raise HTTPException(status_code=401, detail="Email in user")
+        
+        email_service: EmailService = Container.resolve("email_service")
+        token = email_service.handle_request(email, "NEW", self._http_service.webtoken_service)
+
+        return {
+            "detail": "Email sent",
+            "token": token
+        }
         
         
 
@@ -28,6 +38,8 @@ class UsersController:
 
         if new_user.code != verification_code:
             raise HTTPException(status_code=403, detail="Incorrect verification code")
+        
+        print("user password:::::", new_user.password)
         
         hashed_password = self._http_service.hashing_service.hash_password(password=new_user.password)
         hashed_email = self._http_service.hashing_service.hash_for_search(data=new_user.email)

@@ -2,6 +2,7 @@ from src.api.core.services.webtoken_service import WebTokenService
 from src.api.core.middleware.middleware_service import MiddlewareService
 from src.api.core.dependencies.container import Container
 from src.api.core.services.encryption_service import EncryptionService
+from src.api.core.services.email_service import EmailService
 from src.api.core.logs.logger import Logger
 from src.api.core.services.hashing_service import HashingService
 from src.api.core.services.request_validation_service import RequestValidationService
@@ -11,6 +12,9 @@ from src.api.modules.agents.agents_dependencies import configure_agents_dependen
 
 def configure_container():
     # core   
+    email_service = EmailService()
+    Container.register("email_service", email_service)
+
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
 
