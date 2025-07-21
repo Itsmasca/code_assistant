@@ -3,6 +3,10 @@ from fastapi.testclient import TestClient
 from dotenv import load_dotenv
 from src.api.api import app 
 load_dotenv() 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
 
 client = TestClient(app)
 
