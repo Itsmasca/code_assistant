@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
 from src.api.core.dependencies.container import Container
 from src.api.core.middleware.auth_middleware import auth_middleware
-# from src.api.core.middleware.verification_middleware import verified_middleware
+from src.api.core.middleware.verification_middleware import verification_middleware
 from src.api.modules.users.users_controller import UsersController
 from src.api.modules.users.users_models import UserCreate, UserUpdate, UserLogin, UserPublic
 from sqlalchemy.orm import Session
@@ -20,6 +20,7 @@ def get_controller() -> UsersController:
 @router.post("/verified/create", status_code=201)
 def verified_create(
     request: Request,
+    _=Depends(verification_middleware),
     data: UserCreate = Body(...),
     db: Session = Depends(get_db_session),
     controller: UsersController = Depends(get_controller)

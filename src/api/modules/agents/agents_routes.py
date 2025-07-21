@@ -23,7 +23,7 @@ def get_controller():
     return Container.resolve("agents_controller")
 
 @router.post("/generate-code")
-def generate_code(request: Request, data: dict = Body(...)):
+def generate_code(request: Request, _=Depends(auth_middleware), data: dict = Body(...)):
     initial_state = {
         "messages": [],
         "iterations": 0,

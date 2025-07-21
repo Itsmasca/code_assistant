@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, Text, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
 from src.api.core.database.db_models import Base
 import uuid
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON
 
 
 class InteractionRequest(BaseModel):
@@ -42,4 +42,4 @@ class Agent(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     agent_name = Column(Text, nullable=False)
     agent_prompt = Column(Text, nullable=True)
-    agent_json = Column()
+    agent_json = Column(JSON, nullable=True)

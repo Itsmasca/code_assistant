@@ -12,6 +12,17 @@ class UsersController:
         self._users_service = users_service
         self._module = "users.controller"
 
+
+    def verify_email(self, request: Request, db: Session, email: str):
+        hashed_email = self._http_service.hashing_service.hash_for_search(data=email)
+        
+        email_in_use: User = self._users_service.resource(db=db, where_col="email_hash", identifier=hashed_email)
+
+        if email_in_use:
+            raise HTTPException(status_code=401, detail="Email in user")
+        
+        
+
     def create_request(self, request: Request, db: Session, new_user: UserCreate):
         verification_code = request.state.verification_code
 
