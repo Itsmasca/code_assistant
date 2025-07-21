@@ -1,11 +1,17 @@
+import sys
+from pathlib import Path
+
+# 👇 Add this before importing anything from src.*
+root = Path(__file__).resolve().parents[4]  # This should point to your root project directory
+sys.path.insert(0, str(root))
+
 import pytest
 from fastapi.testclient import TestClient
 from dotenv import load_dotenv
 from src.api.api import app 
 load_dotenv() 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+
 
 
 client = TestClient(app)
