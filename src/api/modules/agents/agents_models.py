@@ -6,6 +6,8 @@ from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID, JSON
 
+class GenerateCode(BaseModel):
+    input: str
 
 class AgentCreate(BaseModel):
     agentName: str
@@ -13,8 +15,8 @@ class AgentCreate(BaseModel):
     agentJson: Dict
 
 class AgentPublic(BaseModel):
-    agentId: str = Field(..., alias="agent_id")
-    userId: str = Field(..., alias="user_id")
+    agentId: uuid.UUID = Field(..., alias="agent_id")
+    userId: uuid.UUID = Field(..., alias="user_id")
     agentName: str = Field(..., alias="agent_name")
     agentPrompt: str = Field(..., alias="agent_prompt")
     agentJson: Dict = Field(..., alias="agent_json")
@@ -24,20 +26,25 @@ class AgentPublic(BaseModel):
         "populate_by_name": True, 
     }
 
-    
+
 class AgentUpdate(BaseModel):
     agent_name: Optional[str] = Field(None, alias="agentName")
     agent_prompt: Optional[str] = Field(None, alias="agentPrompt")
-    agent_json: Optional[str] = Field(None, alias="agentJson")
+    agent_json: Optional[Dict] = Field(None, alias="agentJson")
 
-    class Config:
-        validate_by_name = True
+    model_config = {
+        "populate_by_name": True, 
+    }
 
 class AgentToDB(BaseModel):
-    user_id: uuid.UUID
-    agentName: str
-    agentPrompt: str
-    agentJson: Dict
+    user_id: uuid.UUID = Field(..., alias="userId")
+    agent_name: str = Field(..., alias="agentName")
+    agent_prompt: str = Field(..., alias="agentPrompt")
+    agent_json: Dict = Field(..., alias="agentJson")
+
+    model_config = {
+        "populate_by_name": True, 
+    }
 
 
 class Agent(Base):
