@@ -21,7 +21,6 @@ def get_controller():
 
 @router.post("/secure/generate-code/{agent_id}", status_code=200)
 def generate_code(
-    agent_id: uuid.UUID,
     request: Request, 
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
@@ -29,12 +28,12 @@ def generate_code(
 ):
     from src.agent.agent import app as agent_graph  # <-- Importa aquí, dentro de la función
     
-    http_service: HttpService = Container.resolve("http_service")
-    agent_resource: AgentPublic =  http_service.request_validation_service.verify_resource(
-            "agents_service",
-            {"db": db, "agent_id": agent_id},
-            "Agent not found"
-        )
+    # http_service: HttpService = Container.resolve("http_service")
+    # agent_resource: AgentPublic =  http_service.request_validation_service.verify_resource(
+    #         "agents_service",
+    #         {"db": db, "agent_id": agent_id},
+    #         "Agent not found"
+    #     )
     
     initial_state = {
         "messages": [],

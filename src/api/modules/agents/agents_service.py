@@ -42,12 +42,7 @@ class AgentsService():
     
     @staticmethod
     def __map_to_db(agent: AgentToDB) -> Agent:
-        return Agent(
-            user_id=agent.user_id, 
-            agent_name=agent.agentName,
-            agent_prompt=agent.agentPrompt,
-            agent_json=agent.agentJson,
-        )
+        return Agent.model_validate(agent)
 
     @staticmethod
     def __map_from_db(agent: Agent) -> AgentPublic:

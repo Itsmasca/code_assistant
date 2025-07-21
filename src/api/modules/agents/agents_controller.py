@@ -19,7 +19,7 @@ class AgentsController:
 
         agent_data = {
             **data.model_dump(),
-            "user_id": user.user_id
+            "userId": user.user_id
         }
 
         self._agents_service.create(db=db, agent=agent_data)

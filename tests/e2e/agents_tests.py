@@ -16,13 +16,26 @@ delete_token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTEwMDA0YWUt
 
 # Sample agent data for creation
 agent_create_payload = {
-    "agentName": "Test Agent",
-    "agentDescription": "A test agent",
-    "agentPrompt": "Tell funy jokes about according to users input",
+    "agentName": "testkike",
+    "agentPrompt": "Crea un agente de IA personalizado para ser mi compañero de diario digital. Quiero un asistente que me ayude a reflexionar, registrar mis pensamientos y emociones diariamente, ofreciendo un espacio seguro y empático para la escritura personal. El agente debe ser capaz de hacer preguntas reflexivas, escuchar sin juzgar, y potencialmente sugerir temas o ejercicios de introspección si me siento bloqueado",
     "agentJson": {
-        "max_tokens":  4000,
-        "model": "gpt-40"
-    }
+        "openapi": "3.0.3",
+        "info": {
+          "version": "1.6.85",
+          "title": "ConfigRouteAnalyzer",
+          "description": "NeuralSeek - The business LLM accelerator",
+          "license": {
+            "name": "End User License Agreement",
+            "url": "https://neuralseek.com/eula"
+          },
+          "contact": {
+            "name": "NeuralSeek Support",
+            "url": "https://neuralseek.com",
+            "email": "support@NeuralSeek.com"
+          },
+          "termsOfService": "https://neuralseek.com/eula"
+        }
+    } 
 }
 
 # Sample agent update data
@@ -35,16 +48,16 @@ def get_auth_headers():
     return {"Authorization": f"Bearer {token}"}
 
 
-# def test_create_agent():
-#     with TestClient(app) as client:
-#         response = client.post(
-#             "/agents/secure/create",
-#             json=agent_create_payload,
-#             headers=get_auth_headers()
-#         )
+def test_create_agent():
+    with TestClient(app) as client:
+        response = client.post(
+            "/agents/secure/create",
+            json=agent_create_payload,
+            headers=get_auth_headers()
+        )
 
-#         assert response.status_code == 201
-#         assert response.json() == {"detail": "Agent created"}
+        assert response.status_code == 201
+        assert response.json() == {"detail": "Agent created"}
 
 def test_get_agents_collection():
     with TestClient(app) as client:
