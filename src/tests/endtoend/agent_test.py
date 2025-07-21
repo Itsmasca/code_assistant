@@ -1,6 +1,7 @@
 
 import pytest
 from src.agent.agent import app
+from src.service.Llm_service import Llmservice
 
 class DummyCodeSolution:
     imports = "a = 1"
@@ -96,3 +97,51 @@ def test_workflow_e2e(monkeypatch, initial_state):
     print("Código generado:", result["generation"].code)
     print("Imports:", result["generation"].imports)
     print("Prefix:", result["generation"].prefix)
+
+# class DummyChain:
+#     def invoke(self, *args, **kwargs):
+#         # Simula la respuesta estructurada del LLM
+#         return {
+#             "parsed": {
+#                 "prefix": "Solución de ejemplo",
+#                 "imports": "import math",
+#                 "code": "def suma(a, b): return a + b"
+#             },
+#             "parsing_error": None,
+#             "raw": type("Raw", (), {"content": "dummy"}),
+#         }
+
+# @pytest.fixture
+# def llm_service(monkeypatch):
+#     # Solo mockea el constructor si quieres evitar dependencias externas
+#     #monkeypatch.setattr("src.service.Llm_service.Llmservice.__init__", lambda self: None)
+#     service = Llmservice()
+#     # NO mockees retrieve_chain aquí
+#     return service
+
+# # filepath: [agent_test.py](http://_vscodecontentref_/0)
+# def test_llmservice_generate_code(llm_service):
+#     chain = llm_service.retrieve_chain("Genera una función que sume dos números en Python.")
+#     result = chain.invoke({
+#         "context": "Documentación relevante...",
+#         "agentName": "testkike",
+#         "agentId": "testkike",
+#         "improvedPrompt": "Genera una función que sume dos números en Python.",
+#         "agentJson": {"openapi": "3.0.3"},
+#         "messages": []
+#     })
+#     parsed = result  # result ya es un objeto 'code'
+#     print(parsed.prefix)
+#     print(parsed.imports)
+#     print(parsed.code)
+class DummyRetriever:
+    def retrieve(self, query, limit=10):
+        return "contexto de prueba"
+@pytest.fixture
+def llm_context_retriever():
+    service  = Llmservice()
+    return service
+def test_llmservice_retrieve_context(llm_context_retriever, query: str = "Configure a test scenario with routing disabled and strict mode turned off. Provide details on the configuration settings and potential implications of these adjustments."):
+    context = llm_context_retriever.get_context(query)
+    assert context == "contexto de prueba"  # Verifica que el contexto sea el esperado
+    print("Contexto recuperado:", context)
