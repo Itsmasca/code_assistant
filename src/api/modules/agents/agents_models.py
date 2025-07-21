@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Any, Optional
 from sqlalchemy import Column, String, Text, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
-from api.core.database.db_models import Base
+from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 

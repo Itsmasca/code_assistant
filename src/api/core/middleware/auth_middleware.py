@@ -1,7 +1,7 @@
 # middleware/auth_middleware.py
 from fastapi import Request
-from api.core.dependencies.container import Container
-from api.core.middleware.middleware_service import MiddlewareService
+from src.api.core.dependencies.container import Container
+from src.api.core.middleware.middleware_service import MiddlewareService
 
 
 async def auth_middleware(request: Request):

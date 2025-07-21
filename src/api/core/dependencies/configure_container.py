@@ -1,13 +1,13 @@
-from api.core.services.webtoken_service import WebTokenService
-from api.core.middleware.middleware_service import MiddlewareService
-from api.core.dependencies.container import Container
-from api.core.services.encryption_service import EncryptionService
-from api.core.logs.logger import Logger
-from api.core.services.hashing_service import HashingService
-from api.core.services.request_validation_service import RequestValidationService
-from api.core.services.http_service import HttpService
-from api.modules.users.users_dependencies import configure_users_dependencies
-from api.modules.agents.agents_dependencies import configure_agents_dependencies
+from src.api.core.services.webtoken_service import WebTokenService
+from src.api.core.middleware.middleware_service import MiddlewareService
+from src.api.core.dependencies.container import Container
+from src.api.core.services.encryption_service import EncryptionService
+from src.api.core.logs.logger import Logger
+from src.api.core.services.hashing_service import HashingService
+from src.api.core.services.request_validation_service import RequestValidationService
+from src.api.core.services.http_service import HttpService
+from src.api.modules.users.users_dependencies import configure_users_dependencies
+from src.api.modules.agents.agents_dependencies import configure_agents_dependencies
 
 def configure_container():
     # core   

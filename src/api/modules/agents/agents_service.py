@@ -1,11 +1,11 @@
-from api.modules.agents.agents_models import Agent, AgentCreate, AgentPublic, AgentPrivate, AgentUpdate
-from api.core.repository.base_repository import BaseRepository
+from src.api.modules.agents.agents_models import Agent, AgentCreate, AgentPublic, AgentPrivate, AgentUpdate
+from src.api.core.repository.base_repository import BaseRepository
 import logging
-from api.core.logs.logger import Logger
+from src.api.core.logs.logger import Logger
 from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from uuid import UUID
-from api.core.decorators.service_error_handler import service_error_handler
+from src.api.core.decorators.service_error_handler import service_error_handler
 
 class AgentsService():
     _MODULE = "agents.service"

@@ -2,8 +2,8 @@ import os
 import jwt
 from typing import Dict
 from fastapi import Request, HTTPException
-from api.core.services.http_service import HttpService
-from api.core.database.sessions import get_db_session
+from src.api.core.services.http_service import HttpService
+from src.api.core.database.sessions import get_db_session
 from fastapi.security import HTTPBearer
 
 

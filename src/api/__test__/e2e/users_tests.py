@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from core.api import app
 from dotenv import load_dotenv
+from src.api.api import app 
 load_dotenv() 
 
 client = TestClient(app)
@@ -26,7 +27,35 @@ delete_token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTEwMDA0YWUt
 #         assert res.status_code == 201
 #         assert res.json()["detail"] == "User created"
 
+def test_generate_code_success():
+    payload = {
+        "agentName": "testkike",
+        "improvedPrompt": "Genera una función que sume dos números en Python.",
+        "agentJson": {
+            "openapi": "3.0.3",
+            "info": {"title": "TestAgent", "version": "1.0"},
+            "paths": {}
+        }
+    }
+    response = client.post("/agents/generate-code", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "code" in data
+    assert "imports" in data
+    assert "prefix" in data
+    assert data["agentName"] == "testkike"
+    assert data["improvedPrompt"].startswith("Genera una función")
 
+def test_generate_code_missing_fields():
+    payload = {
+        "agentName": "testkike"
+        # Falta improvedPrompt y agentJson
+    }
+    response = client.post("/agents/generate-code", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "code" in data
+    
 def test_create_user_verified_invalid_code():
     with TestClient(app) as client:
         payload = {

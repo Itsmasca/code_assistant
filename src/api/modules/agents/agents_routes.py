@@ -1,13 +1,16 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
-from api.core.dependencies.container import Container
+from src.api.core.dependencies.container import Container
 from typing import List
-from api.core.middleware.auth_middleware import auth_middleware
+from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
-from api.core.database.sessions import get_db_session
-from api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic
-from api.modules.agents.agents_controller import AgentsController
+from src.api.core.database.sessions import get_db_session
+from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic
+from src.api.modules.agents.agents_controller import AgentsController
 import uuid
-from api.core.middleware.middleware_service import security
+from src.api.core.middleware.middleware_service import security
+from src.agent.agent import app as agent_graph
+
+≈
 
 
 router = APIRouter(
@@ -19,20 +22,50 @@ router = APIRouter(
 def get_controller():
     return Container.resolve("agents_controller")
 
-@router.post("/run-agent-graph")
-def run_agent_graph(request: Request, data: dict = Body(...)):
-    # Prepara el estado inicial (ajusta según tus necesidades)
+@router.post("/generate-code")
+def generate_code(request: Request, data: dict = Body(...)):
     initial_state = {
-        "messages": data.get("messages", []),
+        "messages": [],
         "iterations": 0,
         "error": "no",
         "agentName": data.get("agentName", "DefaultAgent"),
         "improvedPrompt": data.get("improvedPrompt", ""),
-        "agentJson": data.get("agentJson", "{}")
+        "agentJson": data.get("agentJson", {}),
     }
-    # Ejecuta el grafo
+    result = agent_graph.invoke(initial_state)
+    return {
+        "code": getattr(result["generation"], "code", ""),
+        "imports": getattr(result["generation"], "imports", ""),
+        "prefix": getattr(result["generation"], "prefix", ""),
+        "messages": result.get("messages", []),
+        "agentName": result.get("agentName", ""),
+        "improvedPrompt": result.get("improvedPrompt", ""),
+        "agentJson": result.get("agentJson", {}),
+        "error": result.get("error", "no"),
+    }
+
+@router.post("/generate-code")
+def generate_code(request: Request, data: dict = Body(...)):
+    initial_state = {
+        "messages": [],
+        "iterations": 0,
+        "error": "no",
+        "agentName": data.get("agentName", "DefaultAgent"),
+        "improvedPrompt": data.get("improvedPrompt", ""),
+        "agentJson": data.get("agentJson", {}),
+    }
     result = app.invoke(initial_state)
-    return result
+    # Solo regresa el bloque de código generado y metadatos útiles
+    return {
+        "code": getattr(result["generation"], "code", ""),
+        "imports": getattr(result["generation"], "imports", ""),
+        "prefix": getattr(result["generation"], "prefix", ""),
+        "messages": result.get("messages", []),
+        "agentName": result.get("agentName", ""),
+        "improvedPrompt": result.get("improvedPrompt", ""),
+        "agentJson": result.get("agentJson", {}),
+        "error": result.get("error", "no"),
+    }
 
 @router.post("/secure/create", status_code=201)
 def secure_create(

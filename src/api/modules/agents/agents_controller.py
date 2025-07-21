@@ -1,12 +1,12 @@
-from api.core.services.http_service import HttpService
-from api.modules.agents.agents_service import AgentsService
-from api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate
+from src.api.core.services.http_service import HttpService
+from src.api.modules.agents.agents_service import AgentsService
+from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException, params
 from fastapi.responses import JSONResponse
-from api.core.services.http_service import HttpService
+from src.api.core.services.http_service import HttpService
 import logging
 from sqlalchemy.orm import Session
-from api.modules.users.users_models import User
+from src.api.modules.users.users_models import User
 import uuid
 
 class AgentsController:
