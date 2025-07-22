@@ -8,16 +8,6 @@ from src.api.modules.agents.agents_service import AgentsService
 from src.api.modules.agents.agents_models import Agent
 
 def configure_agents_dependencies(logger: Logger):
-    repository = BaseRepository(model=Agent)
-    http_service: HttpService = Container.resolve("http_service")
-    service = AgentsService(
-        logger=logger,
-        repository=repository
-    )
-    controller = AgentsController(
-        http_service=http_service,
-        agents_service= service
-    )
-
-    Container.register("agents_service", service)
+    
+    controller = AgentsController()
     Container.register("agents_controller", controller)
