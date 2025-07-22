@@ -46,7 +46,7 @@ async def generate(state: GraphState):
     Llmservice = Container.resolve("llm_service")
     code_gen_chain = await Llmservice.retrieve_chain(state)
     # Solution
-    code_solution = code_gen_chain.invoke(
+    code_solution = code_gen_chain.ainvoke(
         {"context": concatenated_content, 
          "agnetName": agent_name,
          "improvedPrompt": improved_prompt,
@@ -146,13 +146,13 @@ async def reflect(state: GraphState):
     # Add reflection
     Llmservice = Container.resolve("llm_service")
     code_gen_chain = await Llmservice.retrieve_chain(state) 
-    reflections = code_gen_chain.invoke(
+    reflections = code_gen_chain.ainvoke(
         {"context": concatenated_content, 
          "agnetName": state["agentName"],
          "improvedPrompt": state["improvedPrompt"],
          "agentJson": state["agentJson"],
          "messages": messages,
-         input: state["input"]
+         "input": state["input"]
          }
     )
     messages += [("assistant", f"Here are reflections on the error: {reflections}")]
