@@ -51,7 +51,7 @@ def configure_container():
     llm_service = Llmservice()
     Container.register("llm_service", llm_service)
 
-    check_code_service = check_typescript()
+    check_code_service = check_typescript(imports="", code="")
     Container.register("check_code_service", check_code_service)
     
     http_service = HttpService(
