@@ -12,7 +12,7 @@ from src.api.modules.agents.agents_dependencies import configure_agents_dependen
 from src.api.modules.files.files_dependencies import configure_files_dependencies
 from src.api.modules.knowledge_base.knowledge_base_dependencies import configure_knowledge_base_dependencies
 from src.service.Qdrant import QdrantRetriever
-from src.service.Llm_service import LlmService
+from src.service.Llm_service import Llmservice
 from src.service.check_typescript import check_typescript
 from src.api.core.services.embedding_service import EmbeddingService
 from src.agent.prompt_templates import PromptService
