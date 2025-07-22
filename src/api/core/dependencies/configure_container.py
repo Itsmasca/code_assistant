@@ -9,6 +9,8 @@ from src.api.core.services.request_validation_service import RequestValidationSe
 from src.api.core.services.http_service import HttpService
 from src.api.modules.users.users_dependencies import configure_users_dependencies
 from src.api.modules.agents.agents_dependencies import configure_agents_dependencies
+from src.service.Qdrant import QdrantRetriever
+from src.service.llm_service import LlmService
 
 def configure_container():
     # core   
@@ -30,6 +32,14 @@ def configure_container():
     webtoken_service = WebTokenService()
     Container.register("webtoken_service", webtoken_service)
 
+    retriever_service = QdrantRetriever()
+    Container.register("retriever_service", retriever_service)
+
+    llm_service = LlmService()
+    Container.register("llm_service", llm_service)
+
+    
+    
     http_service = HttpService(
         encryption_service=encryption_service,
         logger=logger,

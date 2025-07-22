@@ -13,16 +13,7 @@ class QdrantRetriever:
             url=os.getenv("QDRANT_HOST"),
             api_key=os.getenv("QDRANT_API_KEY")
         )
-        self.collection_name = "qdrant-openai-docs"
-
-        self.client.recreate_collection(
-            collection_name=os.getenv("QDRANT_COLLECTION_NAME"),
-            vectors_config=VectorParams(
-                size=1536,  # Tamaño del vector de embeddings
-                distance=Distance.COSINE  # Tipo de distancia   
-            )
-        )
-        self.model = "text-embedding-ada-002"
+        self.collection_name = os.getenv("QDRANT_COLLECTION_NAME")
     def get_embedding(self, text: str):
         try:
             client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
