@@ -5,9 +5,8 @@ from src.service.Qdrant import QdrantRetriever as EmbeddingService
 from src.agent.state import GraphState
 
 class PromptService:
-    def __init__(self, embedding_service: EmbeddingService, redis_service: RedisService):
+    def __init__(self, embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
-        self.redis_service = redis_service
 
     async def general_query_prompt_template(
             self, 
