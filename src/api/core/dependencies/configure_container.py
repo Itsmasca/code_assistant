@@ -10,7 +10,8 @@ from src.api.core.services.http_service import HttpService
 from src.api.modules.users.users_dependencies import configure_users_dependencies
 from src.api.modules.agents.agents_dependencies import configure_agents_dependencies
 from src.service.Qdrant import QdrantRetriever
-from src.service.llm_service import LlmService
+from src.service.Llm_service import LlmService
+from src.service.check_typescript import check_typescript
 
 def configure_container():
     # core   
@@ -38,7 +39,8 @@ def configure_container():
     llm_service = LlmService()
     Container.register("llm_service", llm_service)
 
-    
+    check_code_service = check_typescript()
+    Container.register("check_code_service", check_code_service)
     
     http_service = HttpService(
         encryption_service=encryption_service,

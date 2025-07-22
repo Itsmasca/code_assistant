@@ -33,6 +33,7 @@ def generate(state: GraphState):
     agent_name = state["agentName"]
     improved_prompt = state["improvedPrompt"]
     agent_json = state["agentJson"]
+    input = state["input"]
 
     # We have been routed back to generation with an error
     if error == "yes":
@@ -42,14 +43,15 @@ def generate(state: GraphState):
                 "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
             )
         ]
-    code_gen_chain = Llmservice.retrieve_chain(state, generate)
+    code_gen_chain = Llmservice.retrieve_chain(state)
     # Solution
     code_solution = code_gen_chain.invoke(
         {"context": concatenated_content, 
          "agnetName": agent_name,
          "improvedPrompt": improved_prompt,
          "agentJson": agent_json,
-         "messages": messages}
+         "messages": messages,
+         "input": input}
     )
     messages += [
         (
@@ -87,33 +89,28 @@ def code_check(state: GraphState):
 
     # Check imports
     try:
-        exec(imports)
+        check_code = Container.resolve("check_code_service")
+        check_code(imports, "")
     except Exception as e:
-        print("---CODE IMPORT CHECK: FAILED---")
-        error_message = [("user", f"Your solution failed the import test: {e}")]
-        messages += error_message
+        print("---TS COMPILATION FAILED---")
+        messages.append(("user", f"TypeScript error: {e}"))
         return {
-            "generation": code_solution,
+            **state,
             "messages": messages,
-            "iterations": iterations,
             "error": "yes",
         }
-
-    # Check execution
+    # Check code
     try:
-        exec(imports + "\n" + code)
+        check_code = Container.resolve("check_code_service")
+        check_code(imports, code)
     except Exception as e:
-        print("---CODE BLOCK CHECK: FAILED---")
-        error_message = [("user", f"Your solution failed the code execution test: {e}")]
-        messages += error_message
+        print("---TS COMPILATION FAILED---")
+        messages.append(("user", f"TypeScript error: {e}"))
         return {
-            "generation": code_solution,
+            **state,
             "messages": messages,
-            "iterations": iterations,
             "error": "yes",
         }
-
-
     # No errors
     print("---NO CODE TEST FAILURES---")
     return {
@@ -146,13 +143,15 @@ def reflect(state: GraphState):
     # Prompt reflection
 
     # Add reflection
-    code_gen_chain = Llmservice.retrieve_chain(state, "reflect") 
+    code_gen_chain = Llmservice.retrieve_chain(state) 
     reflections = code_gen_chain.invoke(
         {"context": concatenated_content, 
          "agnetName": state["agentName"],
          "improvedPrompt": state["improvedPrompt"],
          "agentJson": state["agentJson"],
-         "messages": messages}
+         "messages": messages,
+         input: state["input"]
+         }
     )
     messages += [("assistant", f"Here are reflections on the error: {reflections}")]
     return {"generation": code_solution, "messages": messages, "iterations": iterations}
