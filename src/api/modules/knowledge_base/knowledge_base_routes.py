@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 def get_controller() -> KnowledgeBaseController:
-    Container.resolve("knowledge_base_controller")
+    return Container.resolve("knowledge_base_controller")
 
 @router.post("/upload", response_class=JSONResponse)
 async def add_to_knowledge_base(
