@@ -44,7 +44,7 @@ def configure_container():
     Container.register("retriever_service", retriever_service)
 
     prompt_templates = PromptService(
-        embedding_service=EmbeddingService
+        embedding_service=embeddings_service
     )
     Container.register("prompt_templates", prompt_templates)
     
