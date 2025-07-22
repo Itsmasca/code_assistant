@@ -11,3 +11,6 @@ def configure_files_dependencies(logger: Logger):
     http_service = Container.resolve("http_service")
     service = FilesService(logger=logger, repository=repository)
     controller = FilesController(http_service=http_service, files_service=service)
+
+    Container.register("files_service", service)
+    Container.register("files_controller", controller)
