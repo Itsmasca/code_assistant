@@ -8,9 +8,9 @@ from sqlalchemy.dialects.postgresql import UUID, JSON
 from datetime import datetime
 
 class FileCreate(BaseModel):
-    filename = str
-    file_type = str
-    file_size = str
+    filename: str
+    file_type: str
+    file_size: str
     metadata: Optional[str] = None
 
 class File(Base):
