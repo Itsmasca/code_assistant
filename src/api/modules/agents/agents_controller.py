@@ -13,7 +13,7 @@ from src.api.modules.users.users_models import User
 import uuid
 
 class AgentsController:
-    def prompted_code_generator(data: AgentRequest):
+    def prompted_code_generator(self, data: AgentRequest):
         initial_state: GraphState = {
             "error": "no",
             "messages": [],
@@ -24,7 +24,6 @@ class AgentsController:
             "agentJson": data.agentJson,
             "input": data.input,
         }
-
         try:
             result = agent_graph.invoke(initial_state)
         except Exception as e:
