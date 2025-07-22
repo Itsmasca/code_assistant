@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, Request,  Depends, UploadFile, File
 from fastapi.responses import JSONResponse
-from core.dependencies.container import Container
+from src.api.core.dependencies.container import Container
 from  src.api.core.database.sessions import get_db_session
 from src.api.modules.knowledge_base.knowledge_base_controller import KnowledgeBaseController
 from sqlalchemy.orm import Session
