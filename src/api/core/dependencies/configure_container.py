@@ -46,7 +46,7 @@ def configure_container():
     prompt_templates = PromptService()
     Container.register("prompt_templates", prompt_templates)
     
-    llm_service = Llmservice()
+    llm_service = LlmService()
     Container.register("llm_service", llm_service)
 
     check_code_service = check_typescript()
