@@ -19,7 +19,7 @@ router = APIRouter(
 def get_controller():
     return Container.resolve("agents_controller")
 
-@router.post("/secure/generate-code/{agent_id}", status_code=200)
+@router.post("/secure/generate-code", status_code=200)
 def generate_code(
     payload: AgentRequest, 
     _=Depends(auth_middleware), 
