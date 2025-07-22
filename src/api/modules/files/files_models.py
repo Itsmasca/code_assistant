@@ -11,14 +11,13 @@ class FileCreate(BaseModel):
     filename: str
     file_type: str
     file_size: str
-    metadata: Optional[str] = None
+    file_metadata: Optional[str] = None
 
 class File(Base):
-
     __tablename__ = "files"
     file_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     filename = Column(Text, nullable=False)
     file_type = Column(Text, nullable=False)
     file_size = Column(String, nullable=True)
-    metadata = Column(JSON, nullable=True) 
+    file_metadata = Column(JSON, nullable=True) 
     created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
