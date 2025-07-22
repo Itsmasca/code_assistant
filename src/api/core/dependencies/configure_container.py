@@ -43,7 +43,9 @@ def configure_container():
     retriever_service = QdrantRetriever()
     Container.register("retriever_service", retriever_service)
 
-    prompt_templates = PromptService()
+    prompt_templates = PromptService(
+        embedding_service=EmbeddingService
+    )
     Container.register("prompt_templates", prompt_templates)
     
     llm_service = Llmservice()
