@@ -25,7 +25,7 @@ class EmbeddingService:
             openai_api_key=os.getenv("OPENAI_API_KEY")
         )
         self._text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        self.__collection_name = "code_assistant_knowledge_base"
+        self.__collection_name = os.getenv("QDRANT_COLLECTION_NAME")
 
     def _extract_text(self, file_bytes: bytes, file_type: str) -> str:
         if file_type == "application/pdf":
