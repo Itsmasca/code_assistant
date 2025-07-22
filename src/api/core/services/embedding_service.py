@@ -1,101 +1,83 @@
-from langchain_community.document_loaders import (
-    PyPDFLoader,
-    TextLoader,
-    CSVLoader,
-    UnstructuredExcelLoader,
-    UnstructuredWordDocumentLoader
-)
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import Distance, VectorParams
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-import os
-from typing import Optional, List, Dict
-import uuid
+import csv
+import io
 import time
+import uuid
+import fitz  
+import docx
+import pandas as pd
+from typing import Optional, Dict, List
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
+
 class EmbeddingService:
-    def __init__(self, embedding_model=None):
-        self.client = QdrantClient(
-            url=os.getenv("QDRANT_URL"),
-            api_key=os.getenv("QDRANT_API_KEY")
-        )
-        
-        self.embedding_model = embedding_model or OpenAIEmbeddings(
-            model="text-embedding-3-large",
-            openai_api_key=os.getenv("OPENAI_API_KEY")
-        )
-        
-        self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
-        )
-        
-        self.loader_mapping = {
-            'application/pdf': PyPDFLoader,
-            'text/plain': TextLoader,
-            'text/csv': CSVLoader,
-            'application/vnd.ms-excel': UnstructuredExcelLoader,
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': UnstructuredExcelLoader,
-            'application/msword': UnstructuredWordDocumentLoader,
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': UnstructuredWordDocumentLoader
-        }
+    def __init__(self, client, embedding_model):
+        self.client = client
+        self.embedding_model = embedding_model
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
     def get_collection_name(self, user_id: str, agent_id: str) -> str:
-        """Generate standardized collection names."""
         return f"user_{user_id}_agent_{agent_id}"
-    
-    async def create_collection(self, user_id: str, agent_id: str) -> bool:
+
+    async def create_collection(self, user_id: str, agent_id: str) -> None:
         collection_name = self.get_collection_name(user_id, agent_id)
         try:
             self.client.get_collection(collection_name)
-            return False  
         except:
             self.client.create_collection(
                 collection_name=collection_name,
-                vectors_config=VectorParams(
-                    size=3072,
-                    distance=Distance.COSINE
-                ),
+                vectors_config={"size": 3072, "distance": "Cosine"}
             )
-            return True
 
-    async def delete_user_data(self, user_id: str) -> int: 
-        deleted = 0
-        collections = self.client.get_collections()
-        prefix = f"user_{user_id}_agent_"
-        
-        for collection in collections.collections:
-            if collection.name.startswith(prefix):
-                self.client.delete_collection(collection.name)
-                deleted += 1
-        return deleted
+    def _extract_text(self, file_bytes: bytes, file_type: str) -> str:
+        if file_type == "application/pdf":
+            doc = fitz.open(stream=file_bytes, filetype="pdf")
+            return "\n".join([page.get_text() for page in doc])
+        elif file_type == "text/plain":
+            return file_bytes.decode("utf-8")
+        elif file_type == "text/csv":
+            decoded = file_bytes.decode("utf-8")
+            reader = csv.reader(io.StringIO(decoded))
+            return "\n".join([", ".join(row) for row in reader])
+        elif file_type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"]:
+            doc = docx.Document(io.BytesIO(file_bytes))
+            return "\n".join([p.text for p in doc.paragraphs])
+        elif file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            df = pd.read_excel(io.BytesIO(file_bytes))
+            return df.to_csv(index=False)
+        elif file_type == "text/markdown":
+            return file_bytes.decode("utf-8")
+        else:
+            return file_bytes.decode("utf-8", errors="ignore")
 
     async def embed_uploaded_document(
         self,
-        s3_url: str,
+        file_bytes: bytes,
         file_type: str,
         filename: str,
         user_id: str,
         agent_id: str,
-        custom_metadata: Optional[Dict] = None
+        file_id: uuid.UUID,
+        custom_metadata: Optional[Dict] = None,
     ) -> Dict:
         collection_name = self.get_collection_name(user_id, agent_id)
         await self.create_collection(user_id, agent_id)
 
-        chunks = await self._load_document_from_url(s3_url, file_type, filename)
+        text = self._extract_text(file_bytes, file_type)
+        documents = [Document(page_content=text, metadata={"filename": filename})]
+        chunks = self.text_splitter.split_documents(documents)
 
-        texts = [chunk["text"] for chunk in chunks]
+        texts = [chunk.page_content for chunk in chunks]
         embeddings = await self.embedding_model.aembed_documents(texts)
 
+        timestamp = int(time.time())
         points = []
         for chunk, embedding in zip(chunks, embeddings):
             metadata = {
                 "user_id": user_id,
                 "agent_id": agent_id,
-                "upload_timestamp": int(time.time()),
-                **chunk["metadata"]
+                "upload_timestamp": timestamp,
+                **chunk.metadata
             }
 
             if custom_metadata:
@@ -105,22 +87,20 @@ class EmbeddingService:
                 "id": str(uuid.uuid4()),
                 "vector": embedding,
                 "payload": {
-                    "text": chunk["text"],
+                    "text": chunk.page_content,
                     "metadata": metadata
                 }
             })
 
-        self.client.upsert(
-            collection_name=collection_name,
-            points=points
-        )
+        self.client.upsert(collection_name=collection_name, points=points)
 
         return {
             "status": "success",
             "chunks_processed": len(points),
             "collection": collection_name,
-            "document_id": str(uuid.uuid4())
+            "document_id": str(file_id)
         }
+
 
     async def search_for_context(
         self,
