@@ -15,7 +15,7 @@ import os
 
 class EmbeddingService:
     def __init__(self, embedding_model=None):
-        self.client = QdrantClient(
+        self._client = QdrantClient(
             url=os.getenv("QDRANT_URL"),
             api_key=os.getenv("QDRANT_API_KEY")
         )
