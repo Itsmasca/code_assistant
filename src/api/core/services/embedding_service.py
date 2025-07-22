@@ -2,7 +2,7 @@ import csv
 import io
 import time
 import uuid
-import fitz  
+import pymupdf  
 import docx
 import pandas as pd
 from typing import Optional, Dict, List
@@ -19,7 +19,7 @@ class EmbeddingService:
 
     def _extract_text(self, file_bytes: bytes, file_type: str) -> str:
         if file_type == "application/pdf":
-            doc = fitz.open(stream=file_bytes, filetype="pdf")
+            doc = pymupdf.open(stream=file_bytes, filetype="pdf")
             return "\n".join([page.get_text() for page in doc])
         elif file_type == "text/plain":
             return file_bytes.decode("utf-8")
