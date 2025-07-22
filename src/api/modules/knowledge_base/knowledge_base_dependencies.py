@@ -1,4 +1,4 @@
-from  src.api.core.logs.logger import Logger
+from src.api.core.logs.logger import Logger
 from src.api.core.dependencies.container import Container
 from src.api.modules.knowledge_base.knowledge_base_controller import KnowledgeBaseController
 
