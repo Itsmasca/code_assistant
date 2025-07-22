@@ -13,8 +13,9 @@ class GenerateCode(BaseModel):
     imports: str
     code: Any
 
-class AgentInformation(BaseModel):
+class AgentRequest(BaseModel):
     agentName: str
     improvedPrompt: str
     agentJson: str
+    input: str
 

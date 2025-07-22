@@ -9,7 +9,7 @@ from src.api.modules.agents.agents_controller import AgentsController
 from src.api.core.services.http_service import HttpService
 import uuid
 from src.api.core.middleware.middleware_service import security
-
+from src.agent.agent_model import AgentRequest 
 router = APIRouter(
     prefix="/agents",
     tags=["Agent"],
@@ -21,7 +21,7 @@ def get_controller():
 
 @router.post("/secure/generate-code/{agent_id}", status_code=200)
 def generate_code(
-    request: Request, 
+    payload: AgentRequest, 
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
     data: GenerateCode = Body(...)
@@ -35,46 +35,28 @@ def generate_code(
     #         "Agent not found"
     #     )
     
-    initial_state = {
-        "messages": [],
-        "iterations": 0,
+    initial_state = GraphState = {
         "error": "no",
-        "agentName": "Reflexagent",
-        "improvedPrompt": "Agenty to rreflex a few thoughs by providing two thoughs",
-        "agentJson": """
-        {
-        // ...tu JSON completo aquí (sin cambios)...
-        "openapi": "3.0.3",
-        "info": {
-          "version": "1.6.85",
-          "title": "ConfigRouteAnalyzer",
-          "description": "NeuralSeek - The business LLM accelerator",
-          "license": {
-            "name": "End User License Agreement",
-            "url": "https://neuralseek.com/eula"
-          },
-          "contact": {
-            "name": "NeuralSeek Support",
-            "url": "https://neuralseek.com",
-            "email": "support@NeuralSeek.com"
-          },
-          "termsOfService": "https://neuralseek.com/eula"
-        },
-        // ...resto del JSON...
-        // (no lo repito aquí por espacio, pero no cambies nada más)
-      }
-""",
+        "messages": [],
+        "generation": None,
+        "iterations": 0,
+        "agentName": payload.agentName,
+        "improvedPrompt": payload.improvedPrompt,
+        "agentJson": payload.agentJson,
+        "input": payload.input,
     }
-    result = agent_graph.invoke(initial_state)
+    try:
+        result = agent_graph.invoke(initial_state)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     return {
-        "code": getattr(result["generation"], "code", ""),
-        "imports": getattr(result["generation"], "imports", ""),
-        "prefix": getattr(result["generation"], "prefix", ""),
-        "messages": result.get("messages", []),
         "agentName": result.get("agentName", ""),
-        "improvedPrompt": result.get("improvedPrompt", ""),
-        "agentJson": result.get("agentJson", {}),
-        "error": result.get("error", "no"),
+        "generatiotn": {
+            "prefix": result.get("generation", {}).get("prefix", ""),
+            "imports": result.get("generation", {}).get("imports", ""),
+            "code": result.get("generation", {}).get("code", "")
+        },
+        "messages": result.get("messages", []),
     }
 
 @router.post("/secure/create", status_code=201)
