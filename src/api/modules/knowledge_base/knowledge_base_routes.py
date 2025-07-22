@@ -19,13 +19,8 @@ async def add_to_knowledge_base(
     controller: KnowledgeBaseController = Depends(get_controller),
     db: Session = Depends(get_db_session)
 ):
-    file_bytes = await uploaded_file.read()
-
-    # 3. Extract metadata
-    filename = uploaded_file.filename
-    file_type = uploaded_file.content_type
-    file_size = len(file_bytes)
-    return controller.add_to_knowledge_base(
+  
+    return await controller.add_to_knowledge_base(
         db=db,
-
+        data=uploaded_file
     )

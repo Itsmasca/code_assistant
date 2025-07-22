@@ -1,4 +1,4 @@
-from src.api.modules.files.files_models import FileToDB, File, FilePublic
+from src.api.modules.files.files_models import File, FileCreate
 from src.api.core.repository.base_repository import BaseRepository
 import logging
 from src.api.core.logs.logger import Logger
@@ -14,8 +14,8 @@ class FilesService():
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  file: File) -> File:
-        return self._repository.create(db=db, data=file)
+    def create(self, db: Session,  file: FileCreate) -> File:
+        return self._repository.create(db=db, data=File(**file.model_dump()))
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, file_id: UUID) -> File | None:
