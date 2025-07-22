@@ -27,8 +27,8 @@ dependencies = [
     "redis>=6.2.0",
     "langchain>=0.3.26",
     "langchain-openai>=0.3.28",
-    "fitz>=0.0.1.dev2",
     "docx>=0.2.4",
+    "pymupdf>=1.26.3",
 ]
 
 [tool.poetry.dependencies]
