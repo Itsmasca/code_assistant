@@ -12,11 +12,15 @@ from src.api.modules.agents.agents_dependencies import configure_agents_dependen
 from src.service.Qdrant import QdrantRetriever
 from src.service.Llm_service import LlmService
 from src.service.check_typescript import check_typescript
+from src.api.core.services.embedding_service import EmbeddingService
 
 def configure_container():
     # core   
     email_service = EmailService()
     Container.register("email_service", email_service)
+
+    embedding_service = EmailService()
+    Container.register("embedding_service", embedding_service)
 
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
@@ -35,6 +39,8 @@ def configure_container():
 
     retriever_service = QdrantRetriever()
     Container.register("retriever_service", retriever_service)
+
+
 
     llm_service = LlmService()
     Container.register("llm_service", llm_service)
