@@ -43,14 +43,15 @@ def configure_container():
     retriever_service = QdrantRetriever()
     Container.register("retriever_service", retriever_service)
 
-    prompt_templates = PromptService()
+    prompt_templates = PromptService(
+        embedding_service=EmbeddingService
+    )
     Container.register("prompt_templates", prompt_templates)
     
     llm_service = Llmservice()
     Container.register("llm_service", llm_service)
 
-    check_code_service = check_typescript()
-    Container.register("check_code_service", check_code_service)
+    Container.register("check_code_service", check_typescript)
     
     http_service = HttpService(
         encryption_service=encryption_service,

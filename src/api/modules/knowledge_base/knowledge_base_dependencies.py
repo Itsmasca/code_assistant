@@ -6,8 +6,7 @@ from src.api.modules.knowledge_base.knowledge_base_controller import KnowledgeBa
 def configure_knowledge_base_dependencies():
     http_service = Container.resolve("http_service")
     files_service = Container.resolve("files_service")
-    embeddings_service = Container.resolve("ebeddings_service")
-
+    embeddings_service = Container.resolve("embeddings_service")
     controller = KnowledgeBaseController(
         http_service=http_service,
         files_service=files_service,
