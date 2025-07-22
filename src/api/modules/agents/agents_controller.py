@@ -24,10 +24,7 @@ class AgentsController:
             "agentJson": data.agentJson,
             "input": data.input,
         }
-        try:
-            result = await agent_graph.ainvoke(initial_state)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+        result = await agent_graph.ainvoke(initial_state)
         return {
             "agentName": result.get("agentName", ""),
             "generatiotn": {
