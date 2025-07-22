@@ -21,8 +21,8 @@ def configure_container():
     email_service = EmailService()
     Container.register("email_service", email_service)
 
-    embedding_service = EmbeddingService()
-    Container.register("embedding_service", embedding_service)
+    embeddings_service = EmbeddingService()
+    Container.register("embeddings_service", embeddings_service)
 
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
