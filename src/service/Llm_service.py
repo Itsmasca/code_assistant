@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from typing import Any, Optional
 from src.service.Qdrant import QdrantRetriever
-from src.agent.prompt_templates import Prom
+from src.agent.prompt_templates import PromptService
 from src.agent.state import GraphState
 # imoport copntainer 
 from src.api.core.dependencies.container import Container
@@ -63,7 +63,7 @@ class Llmservice:
 
     def retrieve_chain(self, state: GraphState = None) -> ChatPromptTemplate:
         # Chain with output check
-        prompt_template = Container.resolve("prompt_templates")
+        prompt_template: PromptService = Container.resolve("prompt_templates")
         code_gen_prompt = prompt_template.general_query_prompt_template(state)
         # implement the structured output
         structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
