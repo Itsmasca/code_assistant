@@ -1,9 +1,8 @@
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate,  AIMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.schema import SystemMessage
 from src.service.Redis_service import RedisService
-from src.service.Qdrant import QdrantRetriever as EmbeddingService
 from src.agent.state import GraphState
-
+from src.api.core.services.embedding_service import EmbeddingService
 class PromptService:
     def __init__(self, embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
