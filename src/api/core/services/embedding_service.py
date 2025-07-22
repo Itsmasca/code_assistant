@@ -16,7 +16,7 @@ import os
 class EmbeddingService:
     def __init__(self, embedding_model=None):
         self._client = QdrantClient(
-            url=os.getenv("QDRANT_URL"),
+            url=os.getenv("QDRANT_HOST"),
             api_key=os.getenv("QDRANT_API_KEY")
         )
         
@@ -117,3 +117,13 @@ class EmbeddingService:
         ]
 
         return  "\n\n".join([doc.page_content for doc in docs])
+
+    def scroll(self,):
+        results, _ = self._client.scroll(
+            collection_name=self.__collection_name,
+            limit=10,
+            with_payload=True
+        )
+
+        for point in results:
+            print(point.payload)
