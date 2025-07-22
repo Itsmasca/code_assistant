@@ -8,12 +8,22 @@ import pandas as pd
 from typing import Optional, Dict, List
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
+from qdrant_client import QdrantClient
+import os
 
 
 class EmbeddingService:
-    def __init__(self, client, embedding_model):
-        self._client = client
-        self._embedding_model = embedding_model
+    def __init__(self, embedding_model=None):
+        self.client = QdrantClient(
+            url=os.getenv("QDRANT_URL"),
+            api_key=os.getenv("QDRANT_API_KEY")
+        )
+        
+        self._embedding_model = embedding_model or OpenAIEmbeddings(
+            model="text-embedding-3-large",
+            openai_api_key=os.getenv("OPENAI_API_KEY")
+        )
         self._text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         self.__collection_name = "code_assistant_knowledge_base"
 

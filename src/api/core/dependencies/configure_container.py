@@ -75,7 +75,7 @@ def configure_container():
     # Files 
     configure_files_dependencies(logger=logger)
 
-    # Knowledge base ...must configure files above thsi block
+    # Knowledge base ...must configure files above this block
     configure_knowledge_base_dependencies()
 
 
