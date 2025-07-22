@@ -12,22 +12,10 @@ from langchain_core.documents import Document
 
 class EmbeddingService:
     def __init__(self, client, embedding_model):
-        self.client = client
-        self.embedding_model = embedding_model
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-
-    def get_collection_name(self, user_id: str, agent_id: str) -> str:
-        return f"user_{user_id}_agent_{agent_id}"
-
-    async def create_collection(self, user_id: str, agent_id: str) -> None:
-        collection_name = self.get_collection_name(user_id, agent_id)
-        try:
-            self.client.get_collection(collection_name)
-        except:
-            self.client.create_collection(
-                collection_name=collection_name,
-                vectors_config={"size": 3072, "distance": "Cosine"}
-            )
+        self._client = client
+        self._embedding_model = embedding_model
+        self._text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        self.__collection_name = "code_assistant_knowledge_base"
 
     def _extract_text(self, file_bytes: bytes, file_type: str) -> str:
         if file_type == "application/pdf":
@@ -55,27 +43,20 @@ class EmbeddingService:
         file_bytes: bytes,
         file_type: str,
         filename: str,
-        user_id: str,
-        agent_id: str,
         file_id: uuid.UUID,
         custom_metadata: Optional[Dict] = None,
     ) -> Dict:
-        collection_name = self.get_collection_name(user_id, agent_id)
-        await self.create_collection(user_id, agent_id)
-
         text = self._extract_text(file_bytes, file_type)
         documents = [Document(page_content=text, metadata={"filename": filename})]
-        chunks = self.text_splitter.split_documents(documents)
+        chunks = self._text_splitter.split_documents(documents)
 
         texts = [chunk.page_content for chunk in chunks]
-        embeddings = await self.embedding_model.aembed_documents(texts)
+        embeddings = await self._embedding_model.aembed_documents(texts)
 
         timestamp = int(time.time())
         points = []
         for chunk, embedding in zip(chunks, embeddings):
             metadata = {
-                "user_id": user_id,
-                "agent_id": agent_id,
                 "upload_timestamp": timestamp,
                 **chunk.metadata
             }
@@ -92,12 +73,12 @@ class EmbeddingService:
                 }
             })
 
-        self.client.upsert(collection_name=collection_name, points=points)
+        self._client.upsert(collection_name=self.__collection_name, points=points)
 
         return {
             "status": "success",
             "chunks_processed": len(points),
-            "collection": collection_name,
+            "collection": self.__collection_name,
             "document_id": str(file_id)
         }
 
@@ -105,15 +86,12 @@ class EmbeddingService:
     async def search_for_context(
         self,
         input: str,
-        agent_id: str,
-        user_id: str,
         tok_k: int = 4
     ) -> List[Document]:
-        collection_name = self.get_collection_name(user_id=user_id, agent_id=agent_id)
-        query_embedding = await self.embedding_model.aembed_query(input)
+        query_embedding = await self._embedding_model.aembed_query(input)
 
-        search_results = self.client.search(
-            collection_name=collection_name,
+        search_results = self._client.search(
+            collection_name=self.__collection_name,
             query_vector=query_embedding,
             limit=tok_k,
             with_payload=True
@@ -129,14 +107,3 @@ class EmbeddingService:
         ]
 
         return  "\n\n".join([doc.page_content for doc in docs])
-
-
-    def scroll(self, user_id: str, agent_id: str):
-        results, _ = self.client.scroll(
-            collection_name=f"user_{user_id}_agent_{agent_id}",
-            limit=10,
-            with_payload=True
-        )
-
-        for point in results:
-            print(point.payload)

@@ -1,9 +1,10 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request, HTTPException,UploadFile, File
 from src.api.core.dependencies.container import Container
 from typing import List
 from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
+from src.api.core.services.embedding_service import EmbeddingService
 from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic, GenerateCode
 from src.api.modules.agents.agents_controller import AgentsController
 from src.api.core.services.http_service import HttpService
@@ -126,4 +127,6 @@ def secure_delete(
     controller: AgentsController = Depends(get_controller)
 ):
     return controller.delete_request(request=request, db=db, agent_id=agent_id)
+
+
     

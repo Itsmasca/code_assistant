@@ -14,32 +14,30 @@ class AgentsService():
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  agent: AgentToDB) -> AgentPublic:
-        return self.__map_from_db(self._repository.create(db=db, data=Agent(**agent.model_dump(by_alias=False))))
+    def create(self, db: Session,  agent: AgentToDB) -> Agent:
+        return self._repository.create(db=db, data=Agent(**agent.model_dump(by_alias=False)))
 
     @service_error_handler(module=_MODULE)
-    def resource(self, db: Session, agent_id: UUID) -> AgentPublic | None:
+    def resource(self, db: Session, agent_id: UUID) -> Agent | None:
         result = self._repository.get_one(db=db, key="agent_id", value=agent_id)
         if result is None:
             return None
-        return self.__map_from_db(result)
+        return result
     
     @service_error_handler(module=_MODULE)
-    def collection(self, db: Session, user_id: UUID) -> List[AgentPublic]:
+    def collection(self, db: Session, user_id: UUID) -> List[Agent]:
         result = self._repository.get_many(db=db, key="user_id", value=user_id)
 
         if len(result) != 0:
-            return [self.__map_from_db(agent).model_dump() for agent in result]
+            return result
         return []
     
     @service_error_handler(module=_MODULE)
-    def update(self, db: Session, agent_id: UUID, changes: Dict[str, Any]) -> AgentPublic:
-        return self.__map_from_db(self._repository.update(db=db, key="agent_id", value=agent_id, changes=changes))
+    def update(self, db: Session, agent_id: UUID, changes: Dict[str, Any]) -> Agent:
+        return self._repository.update(db=db, key="agent_id", value=agent_id, changes=changes)
 
     @service_error_handler(module=_MODULE)
-    def delete(self, db: Session, agent_id: UUID)-> AgentPublic:
-        return self.__map_from_db(self._repository.delete(db=db, key="agent_id", value=agent_id))
+    def delete(self, db: Session, agent_id: UUID)-> Agent:
+        return self._repository.delete(db=db, key="agent_id", value=agent_id)
     
-    @staticmethod
-    def __map_from_db(agent: Agent) -> AgentPublic:
-        return AgentPublic.model_validate(agent)
+    

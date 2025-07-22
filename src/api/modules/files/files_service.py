@@ -1,4 +1,4 @@
-from src.api.modules.agents.agents_models import Agent, AgentCreate, AgentPublic, AgentToDB, AgentUpdate
+from src.api.modules.files.files_models import FileToDB, File, FilePublic
 from src.api.core.repository.base_repository import BaseRepository
 import logging
 from src.api.core.logs.logger import Logger
@@ -7,39 +7,37 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from src.api.core.decorators.service_error_handler import service_error_handler
 
-class AgentsService():
+class FilesService():
     _MODULE = "files.service"
     def __init__(self, logger: Logger, repository: BaseRepository):
         self._repository: BaseRepository = repository
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  agent: AgentToDB) -> AgentPublic:
-        return self.__map_from_db(self._repository.create(db=db, data=Agent(**agent.model_dump(by_alias=False))))
+    def create(self, db: Session,  file: File) -> File:
+        return self._repository.create(db=db, data=file)
 
     @service_error_handler(module=_MODULE)
-    def resource(self, db: Session, agent_id: UUID) -> AgentPublic | None:
-        result = self._repository.get_one(db=db, key="agent_id", value=agent_id)
+    def resource(self, db: Session, file_id: UUID) -> File | None:
+        result = self._repository.get_one(db=db, key="file_id", value=file_id)
         if result is None:
             return None
-        return self.__map_from_db(result)
+        return result
     
     @service_error_handler(module=_MODULE)
-    def collection(self, db: Session, user_id: UUID) -> List[AgentPublic]:
-        result = self._repository.get_many(db=db, key="user_id", value=user_id)
+    def collection(self, db: Session, agent_id: UUID) -> List[File]:
+        result = self._repository.get_many(db=db, key="user_id", value=agent_id)
 
         if len(result) != 0:
-            return [self.__map_from_db(agent).model_dump() for agent in result]
+            return result
         return []
     
     @service_error_handler(module=_MODULE)
-    def update(self, db: Session, agent_id: UUID, changes: Dict[str, Any]) -> AgentPublic:
-        return self.__map_from_db(self._repository.update(db=db, key="agent_id", value=agent_id, changes=changes))
+    def update(self, db: Session, file_id: UUID, changes: Dict[str, Any]) -> File:
+        return self._repository.update(db=db, key="agent_id", value=file_id, changes=changes)
 
     @service_error_handler(module=_MODULE)
-    def delete(self, db: Session, agent_id: UUID)-> AgentPublic:
-        return self.__map_from_db(self._repository.delete(db=db, key="agent_id", value=agent_id))
+    def delete(self, db: Session, file_id: UUID)-> File:
+        return self._repository.delete(db=db, key="file_id", value=file_id)
     
-    @staticmethod
-    def __map_from_db(agent: Agent) -> AgentPublic:
-        return AgentPublic.model_validate(agent)
+    
