@@ -3,6 +3,7 @@ from langgraph.graph import END, StateGraph, START
 from src.agent.state import GraphState
 from src.service.LCEL_langchain import concatenated_content
 from src.api.core.dependencies.container import Container
+from src.api.core.decorators.service_error_handler import service_error_handler
 # Max tries
 max_iterations = 3
 # Reflect
@@ -11,7 +12,7 @@ flag = "do not reflect"
 
 ### Nodes
 
-
+@service_error_handler(module="agent.generate")
 async def generate(state: GraphState):
     """
     Generate a code solution
@@ -46,7 +47,7 @@ async def generate(state: GraphState):
     Llmservice = Container.resolve("llm_service")
     code_gen_chain = await Llmservice.retrieve_chain(state)
     # Solution
-    code_solution = code_gen_chain.ainvoke(
+    code_solution = await code_gen_chain.ainvoke(
         {"context": concatenated_content, 
          "agnetName": agent_name,
          "improvedPrompt": improved_prompt,
@@ -65,7 +66,7 @@ async def generate(state: GraphState):
     iterations = iterations + 1
     return {"generation": code_solution, "messages": messages, "iterations": iterations}
 
-  
+@service_error_handler(module="agent.code_check")  
 def code_check(state: GraphState):
     """
     Check code
@@ -146,7 +147,7 @@ async def reflect(state: GraphState):
     # Add reflection
     Llmservice = Container.resolve("llm_service")
     code_gen_chain = await Llmservice.retrieve_chain(state) 
-    reflections = code_gen_chain.ainvoke(
+    reflections = await code_gen_chain.ainvoke(
         {"context": concatenated_content, 
          "agnetName": state["agentName"],
          "improvedPrompt": state["improvedPrompt"],
@@ -162,7 +163,7 @@ async def reflect(state: GraphState):
 
 ### Edges
 
-
+@service_error_handler(module="agent.reflect")
 def decide_to_finish(state: GraphState):
     """
     Determines whether to finish.
