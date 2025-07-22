@@ -21,4 +21,4 @@ class File(Base):
     file_type = Column(Text, nullable=False)
     file_size = Column(String, nullable=True)
     metadata = Column(JSON, nullable=True) 
-    created_at = Column(DateTime, default=datetime.now(datetime.timezone.utc), nullable=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
