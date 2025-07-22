@@ -38,7 +38,7 @@ class PromptService:
         prompt = ChatPromptTemplate.from_messages(messages)
         
         # Carga de todas las variables para el prompt
-        return prompt(
+        return prompt.format(
             agentName=state["agentName"],
             improvedPrompt=state["improvedPrompt"],
             agentJson=state["agentJson"],
