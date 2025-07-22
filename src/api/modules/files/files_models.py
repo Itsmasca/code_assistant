@@ -11,7 +11,7 @@ class FileCreate(BaseModel):
     filename = str
     file_type = str
     file_size = str
-    metadata = Optional[str] = None
+    metadata: Optional[str] = None
 
 class File(Base):
 
