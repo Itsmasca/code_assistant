@@ -1,5 +1,5 @@
 from  src.api.modules.files.files_service import FilesService
-from  src.api.modules.files.files_models import FilePublic, File
+from  src.api.modules.files.files_models import File
 from src.api.modules.users.users_models import User
 from src.api.modules.agents.agents_models import Agent
 from src.api.core.services.http_service import HttpService
@@ -44,5 +44,5 @@ class FilesController:
         return [self.__to_public(file) for file in data]
 
     @staticmethod
-    def __to_public(file: File) -> FilePublic:
-        return FilePublic.model_validate(file)
+    def __to_public(file: File) -> File:
+        return File.model_validate(file)
