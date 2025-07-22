@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Any
-from  src.agent.state import State
+from  src.agent.state import GraphState
 
 
 class LLMConfig(BaseModel):
