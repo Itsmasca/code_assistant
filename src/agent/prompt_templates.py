@@ -1,6 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate,  AIMessagePromptTemplate
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from typing import List, Dict
+from langchain.schema import SystemMessage
 from src.service.Redis_service import RedisService
 from src.service.Qdrant import QdrantRetriever as EmbeddingService
 from src.agent.state import State

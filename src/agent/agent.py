@@ -1,9 +1,8 @@
 ### Parameter
 from langgraph.graph import END, StateGraph, START
 from src.agent.state import GraphState
-from src.service.Llm_service import Llmservice
 from src.service.LCEL_langchain import concatenated_content
-
+from src.api.core.dependencies.container import Container
 # Max tries
 max_iterations = 3
 # Reflect
@@ -11,7 +10,7 @@ max_iterations = 3
 flag = "do not reflect"
 
 ### Nodes
-
+Llmservice = Container.resolve("llm_service")
 
 def generate(state: GraphState):
     """
@@ -43,7 +42,7 @@ def generate(state: GraphState):
                 "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
             )
         ]
-    code_gen_chain = Llmservice.retrieve_chain(improved_prompt)
+    code_gen_chain = Llmservice.retrieve_chain(state, generate)
     # Solution
     code_solution = code_gen_chain.invoke(
         {"context": concatenated_content, 
@@ -147,7 +146,7 @@ def reflect(state: GraphState):
     # Prompt reflection
 
     # Add reflection
-    code_gen_chain = Llmservice.retrieve_chain()
+    code_gen_chain = Llmservice.retrieve_chain(state, "reflect") 
     reflections = code_gen_chain.invoke(
         {"context": concatenated_content, 
          "agnetName": state["agentName"],
