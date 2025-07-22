@@ -12,7 +12,7 @@ flag = "do not reflect"
 ### Nodes
 
 
-def generate(state: GraphState):
+async def generate(state: GraphState):
     """
     Generate a code solution
 
@@ -44,7 +44,7 @@ def generate(state: GraphState):
             )
         ]
     Llmservice = Container.resolve("llm_service")
-    code_gen_chain = Llmservice.retrieve_chain(state)
+    code_gen_chain = await Llmservice.retrieve_chain(state)
     # Solution
     code_solution = code_gen_chain.invoke(
         {"context": concatenated_content, 
@@ -123,7 +123,7 @@ def code_check(state: GraphState):
 
 
 
-def reflect(state: GraphState):
+async def reflect(state: GraphState):
     """
     Reflect on errors
 
@@ -145,7 +145,7 @@ def reflect(state: GraphState):
 
     # Add reflection
     Llmservice = Container.resolve("llm_service")
-    code_gen_chain = Llmservice.retrieve_chain(state) 
+    code_gen_chain = await Llmservice.retrieve_chain(state) 
     reflections = code_gen_chain.invoke(
         {"context": concatenated_content, 
          "agnetName": state["agentName"],

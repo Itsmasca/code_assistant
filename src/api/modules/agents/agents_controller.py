@@ -13,7 +13,7 @@ from src.api.modules.users.users_models import User
 import uuid
 
 class AgentsController:
-    def prompted_code_generator(self, data: AgentRequest):
+    async def prompted_code_generator(self, data: AgentRequest):
         initial_state: GraphState = {
             "error": "no",
             "messages": [],
@@ -25,7 +25,7 @@ class AgentsController:
             "input": data.input,
         }
         try:
-            result = agent_graph.invoke(initial_state)
+            result = await agent_graph.ainvoke(initial_state)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return {

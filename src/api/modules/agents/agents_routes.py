@@ -20,12 +20,12 @@ def get_controller():
     return Container.resolve("agents_controller")
 
 @router.post("/secure/generate-code", status_code=200)
-def generate_code(
+async def generate_code(
     data: AgentRequest = Body(...), 
     _=Depends(auth_middleware), 
     controller: AgentsController = Depends(get_controller)
 ):
-    return controller.prompted_code_generator(data=data)
+    return await controller.prompted_code_generator(data=data)
     
     
 
