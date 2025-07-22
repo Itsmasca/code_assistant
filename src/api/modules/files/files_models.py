@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID, JSON
-from datetime import datetime
+from datetime import datetime, timezone
 
 class FileCreate(BaseModel):
     filename: str
