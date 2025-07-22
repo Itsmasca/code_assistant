@@ -10,7 +10,7 @@ max_iterations = 3
 flag = "do not reflect"
 
 ### Nodes
-Llmservice = Container.resolve("llm_service")
+
 
 def generate(state: GraphState):
     """
@@ -43,6 +43,7 @@ def generate(state: GraphState):
                 "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
             )
         ]
+    Llmservice = Container.resolve("llm_service")
     code_gen_chain = Llmservice.retrieve_chain(state)
     # Solution
     code_solution = code_gen_chain.invoke(
@@ -143,6 +144,7 @@ def reflect(state: GraphState):
     # Prompt reflection
 
     # Add reflection
+    Llmservice = Container.resolve("llm_service")
     code_gen_chain = Llmservice.retrieve_chain(state) 
     reflections = code_gen_chain.invoke(
         {"context": concatenated_content, 
