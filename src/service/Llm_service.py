@@ -61,10 +61,10 @@ class Llmservice:
     def parse_output(self, solution, config=None):
         return solution["parsed"]
 
-    def retrieve_chain(self, state: GraphState = None) -> ChatPromptTemplate:
+    async def retrieve_chain(self, state: GraphState = None) -> ChatPromptTemplate:
         # Chain with output check
         prompt_template: PromptService = Container.resolve("prompt_templates")
-        code_gen_prompt = prompt_template.general_query_prompt_template(state)
+        code_gen_prompt = await prompt_template.general_query_prompt_template(state)
         # implement the structured output
         structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
         code_chain_claude_raw = (
