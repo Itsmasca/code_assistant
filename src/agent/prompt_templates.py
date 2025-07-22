@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplat
 from langchain.schema import SystemMessage
 from src.service.Redis_service import RedisService
 from src.service.Qdrant import QdrantRetriever as EmbeddingService
-from src.agent.state import State
+from src.agent.state import GraphState
 
 class PromptService:
     def __init__(self, embedding_service: EmbeddingService, redis_service: RedisService):
@@ -11,7 +11,7 @@ class PromptService:
 
     async def general_query_prompt_template(
             self, 
-            state: State
+            state: GraphState
         ): 
 
         messages = [
