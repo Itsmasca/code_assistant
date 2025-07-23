@@ -10,6 +10,8 @@ from src.api.core.services.http_service import HttpService
 import uuid
 from src.api.core.middleware.middleware_service import security
 from src.agent.agent_model import AgentRequest 
+from src.agent.generate_code_graph import create_graph
+
 router = APIRouter(
     prefix="/agents",
     tags=["Agent"],
@@ -26,6 +28,14 @@ async def generate_code(
     controller: AgentsController = Depends(get_controller)
 ):
     return await controller.prompted_code_generator(data=data)
+
+@router.post("/secure/react-code", status_code=200)
+async def generate_react_code(
+    data: GenerateCode = Body(...),
+    controller: AgentsController = Depends(get_controller),
+    graph = Depends(create_graph)
+):
+    return controller.prompted_react_code_generator(graph=graph, data=data)
     
     
 
