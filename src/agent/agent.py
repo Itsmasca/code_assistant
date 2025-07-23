@@ -48,7 +48,7 @@ async def generate(state: GraphState):
     # Solution
     code_solution = await code_gen_chain.ainvoke(
         {"context": concatenated_content, 
-         "agnetName": agent_name,
+         "agentName": agent_name,
          "improvedPrompt": improved_prompt,
          "agentJson": agent_json,
          "messages": messages,
