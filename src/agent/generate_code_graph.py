@@ -20,7 +20,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     response = await chain.ainvoke({"input": state["input"]})
 
-    state["generated_code"] = response.content.strip().lower()
+    state["generated_code"] = response.content.strip()
 
     return state
 
@@ -34,7 +34,7 @@ async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     response = await chain.ainvoke({"code": state["generated_code"]})
 
-    state["final_code"] = response.content.strip().lower()
+    state["final_code"] = response.content.strip()
 
     return state
 
