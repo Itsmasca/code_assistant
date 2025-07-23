@@ -76,6 +76,7 @@ class PromptService:
                 - A complete code snippet, wrapped in a code block.
                 - Optional brief explanation (1-2 lines max).
                 - If applicable, mention assumptions (e.g. "Assuming you use React 18").
+                - All  comments must be in the language of the input
 
                 ---
 
@@ -85,22 +86,10 @@ class PromptService:
                 3. "Modify this component to use a grid layout on desktop and a single column on mobile."
                 4. "Add hover animations and transition effects to this button."
                 5. "Turn this HTML layout into a React + Tailwind component."
-
                 ---
-
                 Act as a professional React developer and output valid, clean, and efficient React code using Tailwind CSS.
 
-                """),
-
-            SystemMessage(content="""
-            IMPORTANT Your response MUST include these three fields: 
-            1) prefix (description),    
-            2) imports (all required import statements),    
-            3) code (the complete code block, not including imports).
-            4) All comments must be in the language of the input.
-            Structure your answer as a JSON object with these three fields. Do NOT omit any field. Invoke the code tool to structure the output correctly.
-            \n\nExample response:\n{{\n  \"prefix\": \"Description of the solution...\",\n  \"imports\": \"import ...\",\n  \"code\": \"def suma(a, b): return a + b\"\n}}.
-            """)
+                """)
         ]
 
         context = await self.embedding_service.search_for_context(
@@ -123,4 +112,80 @@ class PromptService:
         # Carga de todas las variables para el prompt
         return prompt
     
+
+    async def code_revision_prompt(
+        self, 
+        state: GraphState
+    ):
+        messages = [
+            SystemMessage(content=""""
+                You are a senior front-end code reviewer and refactorer, with deep expertise in React and Tailwind CSS.
+
+                Your job is to receive raw or generated React component code and perform the following tasks:
+
+                ### Objectives
+                1. **Detect and fix any syntax errors** or incorrect JSX usage.
+                2. **Validate Tailwind class names** and correct any that are invalid or misused.
+                3. **Improve code readability**, structure, and modularity where appropriate.
+                4. **Ensure accessibility (a11y)** and semantic HTML usage (e.g., use `button`, not `div` for actions).
+                5. **Enforce React and Tailwind best practices**, including:
+                - Functional components
+                - Descriptive class structures
+                - Proper use of props
+                - Avoid unnecessary wrappers
+                - Mobile-first responsive design
+                6. **Ensure the final code is production-ready**, clean, and copy-pasteable.
+                7. **Avoid unnecessary changes** — preserve original structure unless an improvement is clearly justified.
+
+                ### 🧾 Input
+                You will receive:
+                - React component code (JSX)
+                - Page sections using Tailwind CSS
+                - Sometimes, partial code or broken snippets
+
+                ### Output Format
+                - A **cleaned and corrected code snippet**, wrapped in a code block
+                - A brief explanation of the changes you made (2–4 bullet points max) as comments in the code
+                - If assumptions were made, clearly state them
+
+                ### 💡 Style Guidelines
+                - Use ES6+ syntax (arrow functions, destructuring)
+                - Avoid inline styles or external CSS unless instructed
+                - Use Tailwind for **all styling**
+                - Prefer semantic tags (`header`, `nav`, `main`, `section`, `footer`, `button`, `form`, etc.)
+                - Add responsive utility classes (`sm:`, `md:`, `lg:`) when appropriate
+
+                ---
+
+                ## 🛠 Example User Prompts
+                1. "Review this React button component and fix any Tailwind class issues."
+                2. "Clean up this hero section code and make sure it’s responsive and accessible."
+                3. "Fix syntax and improve structure in this layout component."
+
+                ---
+
+                Act as a top-level reviewer from a professional design system team. Be precise, minimal, and thoughtful in your corrections.
+
+            """)
+        ]
+
+        context = await self.embedding_service.search_for_context(
+            input=state["input"]
+        )
+ 
+        if context:
+            messages.append(SystemMessage(content=f"""
+                You have access to the following relevant context retrieved from documents. Use this information to inform your response. Do not make up facts outside of this context.
+
+                Relevant context:
+                {context}
+            """))
+
+        
+        messages.append(HumanMessagePromptTemplate.from_template('{input}'))
+
+        prompt = ChatPromptTemplate.from_messages(messages)
+        
+        # Carga de todas las variables para el prompt
+        return prompt
     
