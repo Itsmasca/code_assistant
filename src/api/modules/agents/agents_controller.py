@@ -22,16 +22,17 @@ class AgentsController:
             "agentName": data.agentName,
             "improvedPrompt": data.improvedPrompt,
             "agentJson": data.agentJson,
-            "input": data.input
+            "input": data.input,
         }
         graph = create_graph()
         result = await graph.ainvoke(initial_state)
+        generation = result.get("generation")
         return {
             "agentName": result.get("agentName", ""),
             "generatiotn": {
-                "prefix": result.get("generation", {}).get("prefix", ""),
-                "imports": result.get("generation", {}).get("imports", ""),
-                "code": result.get("generation", {}).get("code", "")
+                "prefix": generation.prefix if generation else "",
+                "imports": generation.imports if generation else "",
+                "code": generation.code if generation else "",
             },
             "messages": result.get("messages", []),
     }
