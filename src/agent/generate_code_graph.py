@@ -12,7 +12,7 @@ from src.agent.state import GenerateCodeState
 
 async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
-    prompt_service: PromptService = Container.resolve("prompt_service")
+    prompt_service: PromptService = Container.resolve("prompt_templates")
 
     prompt = prompt_service.code_generation_prompt(state=state)
 
@@ -26,7 +26,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
 # revise code 
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
-    prompt_service: PromptService = Container.resolve("prompt_service")
+    prompt_service: PromptService = Container.resolve("prompt_templates")
 
     prompt = prompt_service.code_revision_prompt(state=state)
 
