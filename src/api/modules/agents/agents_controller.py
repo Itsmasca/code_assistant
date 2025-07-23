@@ -11,7 +11,7 @@ import logging
 from sqlalchemy.orm import Session
 from src.api.modules.users.users_models import User
 import uuid
-from src.agent.generate_code_graph import GenerateCodeState
+from src.agent.state import GenerateCodeState
 
 class AgentsController:
     async def prompted_code_generator(self, data: AgentRequest):
