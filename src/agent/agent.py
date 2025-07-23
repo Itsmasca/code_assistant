@@ -12,7 +12,6 @@ flag = "do not reflect"
 
 ### Nodes
 
-@service_error_handler(module="agent.generate")
 async def generate(state: GraphState):
     """
     Generate a code solution
@@ -66,7 +65,6 @@ async def generate(state: GraphState):
     iterations = iterations + 1
     return {"generation": code_solution, "messages": messages, "iterations": iterations}
 
-@service_error_handler(module="agent.code_check")  
 def code_check(state: GraphState):
     """
     Check code
@@ -163,7 +161,6 @@ async def reflect(state: GraphState):
 
 ### Edges
 
-@service_error_handler(module="agent.reflect")
 def decide_to_finish(state: GraphState):
     """
     Determines whether to finish.
