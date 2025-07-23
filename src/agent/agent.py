@@ -184,25 +184,32 @@ def decide_to_finish(state: GraphState):
         else:
             return "generate"
         
+def create_graph():
+    """
+    Creates the graph for code generation.
+    
+    Returns:
+        StateGraph: The generated state graph.
+    """
+    workflow = StateGraph(GraphState)
 
-workflow = StateGraph(GraphState)
+    # Define the nodes
+    workflow.add_node("generate", generate)  # generation solution
+    workflow.add_node("check_code", code_check)  # check code
+    workflow.add_node("reflect", reflect)  # reflect
 
-# Define the nodes
-workflow.add_node("generate", generate)  # generation solution
-workflow.add_node("check_code", code_check)  # check code
-workflow.add_node("reflect", reflect)  # reflect
-
-# Build graph
-workflow.add_edge(START, "generate")
-workflow.add_edge("generate", "check_code")
-workflow.add_conditional_edges(
-    "check_code",
-    decide_to_finish,
-    {
-        "end": END,
-        "reflect": "reflect",
-        "generate": "generate",
-    },
-)
-workflow.add_edge("reflect", "generate")
-app = workflow.compile()
+    # Build graph
+    workflow.add_edge(START, "generate")
+    workflow.add_edge("generate", "check_code")
+    workflow.add_conditional_edges(
+        "check_code",
+        decide_to_finish,
+        {
+            "end": END,
+            "reflect": "reflect",
+            "generate": "generate",
+        },
+    )
+    workflow.add_edge("reflect", "generate")
+    app = workflow.compile()
+    return app  

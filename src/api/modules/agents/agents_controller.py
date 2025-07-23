@@ -4,7 +4,7 @@ from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, Agent
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException, params
 from fastapi.responses import JSONResponse
 from src.api.core.services.http_service import HttpService
-from src.agent.agent import app as agent_graph 
+from src.agent.agent import create_graph
 from src.agent.agent_model import AgentRequest
 from  src.agent.state import GraphState
 import logging
@@ -24,7 +24,8 @@ class AgentsController:
             "agentJson": data.agentJson,
             "input": data.input,
         }
-        result = await agent_graph.ainvoke(initial_state)
+        graph = create_graph()
+        result = await graph.ainvoke(initial_state)
         return {
             "agentName": result.get("agentName", ""),
             "generatiotn": {
