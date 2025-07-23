@@ -13,7 +13,6 @@ from src.api.modules.files.files_dependencies import configure_files_dependencie
 from src.api.modules.knowledge_base.knowledge_base_dependencies import configure_knowledge_base_dependencies
 from src.service.Qdrant import QdrantRetriever
 from src.service.Llm_service import Llmservice
-from src.service.check_typescript import check_typescript
 from src.api.core.services.embedding_service import EmbeddingService
 from src.agent.prompt_templates import PromptService
 
@@ -51,7 +50,6 @@ def configure_container():
     llm_service = Llmservice()
     Container.register("llm_service", llm_service)
 
-    Container.register("check_code_service", check_typescript)
     
     http_service = HttpService(
         encryption_service=encryption_service,

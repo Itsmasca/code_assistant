@@ -69,7 +69,7 @@ class Llmservice:
         await prompt_template.rewriteimproved_prompt(state)
         if component == "layout":
             code_gen_prompt = prompt_template.layout_code_gen_prompt
-            code_gen_chian = 
+            #code_gen_chian = 
         # implement the structured output
         structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
         code_chain_claude_raw = (

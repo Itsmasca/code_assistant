@@ -18,3 +18,5 @@ class AgentRequest(BaseModel):
     improvedPrompt: str
     agentJson: str
 
+class ReactCodeGenerationRequest(BaseModel):
+    input: str
