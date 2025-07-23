@@ -1,6 +1,6 @@
 from src.api.core.services.http_service import HttpService
 from src.api.modules.agents.agents_service import AgentsService
-from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate, AgentToDB, Agent
+from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate, AgentToDB, Agent, GenerateCode
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException, params
 from fastapi.responses import JSONResponse
 from src.api.core.services.http_service import HttpService
@@ -11,6 +11,7 @@ import logging
 from sqlalchemy.orm import Session
 from src.api.modules.users.users_models import User
 import uuid
+from src.agent.generate_code_graph import GenerateCodeState
 
 class AgentsController:
     async def prompted_code_generator(self, data: AgentRequest):
@@ -36,6 +37,17 @@ class AgentsController:
             },
             "messages": result.get("messages", []),
     }
+
+    async def prompted_react_code_generator(self, graph, data: GenerateCode):
+        state: GenerateCodeState =  {
+            "input": data.input,
+            "generated_code": None,
+            "final_code": None
+        }
+
+        final_state: GenerateCodeState = await graph.ainvoke(state)
+
+        return { "code": final_state["final_code"]}
     
      
 

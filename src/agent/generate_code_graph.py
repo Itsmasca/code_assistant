@@ -8,7 +8,6 @@ from src.api.core.dependencies.container import Container
 class GenerateCodeState(BaseModel):
     input: str
     generated_code: str
-    revised_code: str
     final_code: str
 
 
@@ -18,13 +17,13 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     prompt_service: PromptService = Container.resolve("prompt_service")
 
-    prompt = prompt_service.code_generation_prompt()
+    prompt = prompt_service.code_generation_prompt(state=state)
 
     chain = llm | prompt
 
     response = await chain.ainvoke({"input": state["input"]})
 
-    state["response"] = response.content.strip().lower()
+    state["generated_code"] = response.content.strip().lower()
 
     return state
 
@@ -32,13 +31,13 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
     prompt_service: PromptService = Container.resolve("prompt_service")
 
-    prompt = prompt_service.code_revision_prompt()
+    prompt = prompt_service.code_revision_prompt(state=state)
 
     chain = llm | prompt
 
-    response = await chain.ainvoke({"input": state["input"]})
+    response = await chain.ainvoke({"code": state["generated_code"]})
 
-    state["response"] = response.content.strip().lower()
+    state["final_code"] = response.content.strip().lower()
 
     return state
 
@@ -47,8 +46,16 @@ async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
 def create_graph(llm: ChatAnthropic):
     graph = StateGraph(GenerateCodeState)
 
-    graph.add_node("generate_code", generate_code)
-    graph.add_node("revise_code", revise_code)
-    graph.set_entry_point("classify_intent")
+    async def generate_code_node(state):
+        return await generate_code(state=state, llm=llm, )
+    
+    async def revise_code_node(state):
+        return await revise_code(state=state, llm=llm)
+
+    graph.add_node("generate_code", generate_code_node)
+    graph.add_node("revise_code", revise_code_node)
+    graph.set_entry_point("generate")
+
+    graph.add_edge("revise_code", END)
 
     return graph.compile()
