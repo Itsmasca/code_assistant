@@ -4,25 +4,103 @@ from src.service.Redis_service import RedisService
 from src.agent.state import GraphState
 from src.api.core.services.embedding_service import EmbeddingService
 from src.api.core.decorators.service_error_handler import service_error_handler
-from src.agent.state import GenerateCodeState
-
+from src.agent.generate_code_graph import GenerateCodeState
+from src.api.core.decorators.log_exceptions import log_exceptions
+from langchain_anthropic import ChatAnthropic
 
 class PromptService:
     def __init__(self, embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
-    
-    
-    @service_error_handler(module="prompt.templates.general_query")
-    async def general_query_prompt_template(
+    async def rewriteimproved_prompt(self, state: GraphState):
+        
+        agentName = state["agentName"]
+        improvedPrompt = state["improvedPrompt"]
+        component = ""
+        
+        prompt = f"""<instructions>
+            Favor de generar la parte "{component}" del sitio para el agente "{agentName}" con el siguiente prompt mejorado:
+            {improvedPrompt}
+
+            Agrega una página Next.js que incluya un componente de generación de código que:
+            - Realice una petición POST a /api/agents/secure/generate-code con el cuerpo {{ query: input, agentId: "{agentName}" }}.
+            - Muestre el código generado en un bloque de código.
+            CRITICAL REQUIREMENT: Return ONLY valid code; do NOT include markdown, explanations, or comments outside the code.
+            </instructions>"""        
+        llm = ChatAnthropic(
+            temperature=0.1,
+            model="claude-opus-4-20250514",
+            api_key=os.getenv("ANTROPHIC_API_KEY"),
+            thinking={"type": "enabled", "budget_tokens": 2000}
+        )
+        rephrased = await llm.invoke(prompt)
+        state["input"] = rephrased
+        return {"input": rephrased}
+            
+    @log_exceptions(module="prompt.generating.layout.error")
+    async def prompt_generating_layout(
             self, 
             state: GraphState
         ): 
 
         messages = [
-            SystemMessage(content = "<instructions> ...existing instructions... Your response MUST include these three fields: 1) prefix (description), 2) imports (all required import statements), 3) code (the complete code block, not including imports). Structure your answer as a JSON object with these three fields. Do NOT omit any field. Invoke the code tool to structure the output correctly. \n\nExample response:\n{{\n  \"prefix\": \"Description of the solution...\",\n  \"imports\": \"import ...\",\n  \"code\": \"def suma(a, b): return a + b\"\n}}\n</instructions> ..."),
-            SystemMessagePromptTemplate.from_template(template = "Generate a complete Next.js React component for a dynamic agent interface based on this agent specification:\nAgent Name: {agentName}\nImproved Prompt: {improvedPrompt}\nAgent JSON Configuration:\n{agentJson}\nCRITICAL REQUIREMENTS:\n1. Return ONLY valid code. Do NOT include markdown, explanations, or comments outside the code.\n2. The file MUST start with an import statement (e.g., import useState from 'react').\n3. On form submit, POST the user's plain text query and the agent's unique ID to /api/ask-agent as JSON: query, agentId.\n4. Use \"{agentName}\" as the agentId value.\n5. Display the response from the backend in the UI.\n6. Do NOT use mock data. Do NOT use JSON.parse on user input.\n7. Assume the backend endpoint will use the agent's JSON to call NeuralSeek and return the answer.\n8. Use fetch, not axios.\n9. Always use async/await.\nALSO GENERATE THIS FILE:\nCreate a Next.js API route at pages/api/ask-agent.ts that:\n- Accepts only POST requests with query, agentId in the body.\n- Calls https://stagingapi.neuralseek.com/v1/liam-demo/{agentId}/maistro with the query as the payload.\n- Uses the apikey from the environment variable process.env.NEURALSEEK_API_KEY.\n- Returns the NeuralSeek response as JSON.\n- Returns 405 for non-POST requests and 400 for missing fields."),
-            SystemMessage(content= "Example implementation (as a string, not real code!):\n// pages/api/ask-agent.ts\nimport type {{ NextApiRequest, NextApiResponse }} from 'next';\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {{\nif (req.method !== 'POST') {{\nreturn res.status(405).json({{ error: 'Method not allowed' }});\n}}\nconst {{ query, agentId }} = req.body;\nif (!query || !agentId) {{\nreturn res.status(400).json({{ error: 'Missing query or agentId' }});\n}}\nconst nsRes = await fetch(\n\"https://stagingapi.neuralseek.com/v1/liam-demo/maistro\",\n{{\nmethod: 'POST',\nheaders: {{\n'Content-Type': 'application/json',\n'apikey': process.env.NEURALSEEK_API_KEY!,\n}},\nbody: JSON.stringify({{ params: {{ use_case_summary: query }} }}),\n}}\n);\nconst data = await nsRes.json();\nreturn res.status(200).json(data);\n}}"),
+            SystemMessage(content=f"""<instructions>
+        Generate a Next.js page at pages/agents/[agentId].tsx that will:
+        - Import React and necessary hooks.
+        - Read agentId from Next.js router.
+        - Render a container with:
+            1. A heading displaying “Agent: {state.agentName}”.
+            2. A subtitle showing {state.agentJson.get('info',{{}}).get('description','')}.
+            3. A placeholder <CodeGenerator /> component.
+        - Export a default React component.
+        CRITICAL REQUIREMENT: Return ONLY valid code; do NOT include markdown, explanations, or comments outside the code.
+        </instructions>"""),
+            HumanMessagePromptTemplate.from_template(
+                f"Agent Name: {state.agentName}\nAgent JSON Configuration: {state.agentJson}"
+            )
         ]
+
+
+        context = await self.embedding_service.search_for_context(
+            input = state
+        )
+ 
+        if context:
+            messages.append(SystemMessage(content=f"""
+                You have access to the following relevant context retrieved from documents. Use this information to inform your response. Do not make up facts outside of this context.
+
+                Relevant context:
+                {context}
+            """))
+
+        
+        messages.append(HumanMessagePromptTemplate.from_template('{input}'))
+
+        prompt = ChatPromptTemplate.from_messages(messages)
+        
+        # Carga de todas las variables para el prompt
+        return prompt
+    @log_exceptions(module="prompt.generating.component.error")
+    async def prompt_generating_component(
+            self, 
+            state: GraphState
+        ): 
+
+        messages = [
+                    SystemMessage(content=f"""<instructions>
+        Generate a React component named CodeGenerator that:
+        - Uses useState to track user input and response.
+        - Renders:
+            1. A text input bound to state.
+            2. A “Generate” button that, on click, POSTs {{ query: input, agentId: "{state.agentName}" }} to /api/agents/secure/generate-code using async/await and native fetch.
+            3. A loading indicator while waiting.
+            4. Displays the returned code inside a <pre> block.
+        CRITICAL REQUIREMENT: Return ONLY valid code; do NOT include markdown, explanations, or comments outside the code.
+        </instructions>"""),
+                    HumanMessagePromptTemplate.from_template(
+                        f"Agent Name: {state.agentName}\nAgent JSON Configuration: {state.agentJson}"
+                    )
+                ]
+
 
         context = await self.embedding_service.search_for_context(
             input=state["input"]
@@ -35,6 +113,95 @@ class PromptService:
                 Relevant context:
                 {context}
             """))
+
+        
+        messages.append(HumanMessagePromptTemplate.from_template('{input}'))
+
+        prompt = ChatPromptTemplate.from_messages(messages)
+        
+        # Carga de todas las variables para el prompt
+        return prompt
+    
+    @log_exceptions(module="prompt.generating.routes.error")
+    async def prompt_generating_routes(
+            self, 
+            state: GraphState
+        ): 
+
+        messages = [
+        SystemMessage(content=f"""<instructions>
+        Create a Next.js API route file at pages/api/ask-agent.ts that:
+        - Accepts only POST requests with JSON body {{ query, agentId }}.
+        - Returns 405 for non-POST methods.
+        - Returns 400 if query or agentId is missing.
+        - On valid requests, calls:
+            POST https://stagingapi.neuralseek.com/v1/liam-demo/{state.agentName}/maistro
+            with headers Content-Type: application/json and apikey: process.env.NEURALSEEK_API_KEY
+            and body {{ params: {{ use_case_summary: query }} }}.
+        - Returns the NeuralSeek JSON response with status 200.
+        CRITICAL REQUIREMENT: Return ONLY valid code; do NOT include markdown or comments outside the code.
+        </instructions>"""),
+                    HumanMessagePromptTemplate.from_template(
+                        f"Agent Name: {state.agentName}\nAgent JSON Configuration: {state.agentJson}"
+                    )
+                ]
+
+
+        context = await self.embedding_service.search_for_context(
+            input=state["input"]
+        )
+ 
+        if context:
+            messages.append(SystemMessage(content=f"""
+                You have access to the following relevant context retrieved from documents. Use this information to inform your response. Do not make up facts outside of this context.
+
+                Relevant context:
+                {context}
+            """))
+    @log_exceptions(module="prompt.generating.assemble.error")
+    async def prompt_generating_assemble(
+            self, 
+            state: GraphState
+        ): 
+
+        messages = [
+        SystemMessage(content=f"""<instructions>
+        Create a Next.js API route file at pages/api/ask-agent.ts that:
+        - Accepts only POST requests with JSON body {{ query, agentId }}.
+        - Returns 405 for non-POST methods.
+        - Returns 400 if query or agentId is missing.
+        - On valid requests, calls:
+            POST https://stagingapi.neuralseek.com/v1/liam-demo/{state.agentName}/maistro
+            with headers Content-Type: application/json and apikey: process.env.NEURALSEEK_API_KEY
+            and body {{ params: {{ use_case_summary: query }} }}.
+        - Returns the NeuralSeek JSON response with status 200.
+        CRITICAL REQUIREMENT: Return ONLY valid code; do NOT include markdown or comments outside the code.
+        </instructions>"""),
+                    HumanMessagePromptTemplate.from_template(
+                        f"Agent Name: {state.agentName}\nAgent JSON Configuration: {state.agentJson}"
+                    )
+                ]
+
+
+        context = await self.embedding_service.search_for_context(
+            input=state["input"]
+        )
+ 
+        if context:
+            messages.append(SystemMessage(content=f"""
+                You have access to the following relevant context retrieved from documents. Use this information to inform your response. Do not make up facts outside of this context.
+
+                Relevant context:
+                {context}
+            """))
+
+        
+        messages.append(HumanMessagePromptTemplate.from_template('{input}'))
+
+        prompt = ChatPromptTemplate.from_messages(messages)
+        
+        # Carga de todas las variables para el prompt
+        return prompt
 
         
         messages.append(HumanMessagePromptTemplate.from_template('{input}'))
@@ -141,4 +308,3 @@ class PromptService:
         
         # Carga de todas las variables para el prompt
         return prompt
-    

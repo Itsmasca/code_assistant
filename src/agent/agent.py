@@ -50,7 +50,6 @@ async def generate(state: GraphState):
          "improvedPrompt": improved_prompt,
          "agentJson": agent_json,
          "messages": messages,
-         "input": input,
          "agentId": "test"
          }
     )
