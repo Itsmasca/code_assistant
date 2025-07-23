@@ -5,7 +5,7 @@ from src.agent.state import GraphState
 from src.api.core.services.embedding_service import EmbeddingService
 from src.api.core.decorators.service_error_handler import service_error_handler
 from src.agent.generate_code_graph import GenerateCodeState
-from src.api.core.decorators.log_exceptions import log_exceptions
+from src.api.core.decorators.log_errors import log_exceptions
 from langchain_anthropic import ChatAnthropic
 
 class PromptService:
