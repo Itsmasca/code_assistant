@@ -1,7 +1,6 @@
 ### Parameter
 from langgraph.graph import END, StateGraph, START
 from src.agent.state import GraphState
-from src.service.LCEL_langchain import concatenated_content
 from src.api.core.dependencies.container import Container
 from src.api.core.decorators.service_error_handler import service_error_handler
 # Max tries
@@ -47,8 +46,7 @@ async def generate(state: GraphState):
     code_gen_chain = await Llmservice.retrieve_chain(state)
     # Solution
     code_solution = await code_gen_chain.ainvoke(
-        {"context": concatenated_content, 
-         "agentName": agent_name,
+        {"agentName": agent_name,
          "improvedPrompt": improved_prompt,
          "agentJson": agent_json,
          "messages": messages,
@@ -153,8 +151,7 @@ async def reflect(state: GraphState):
     Llmservice = Container.resolve("llm_service")
     code_gen_chain = await Llmservice.retrieve_chain(state) 
     reflections = await code_gen_chain.ainvoke(
-        {"context": concatenated_content, 
-         "agnetName": state["agentName"],
+        {"agnetName": state["agentName"],
          "improvedPrompt": state["improvedPrompt"],
          "agentJson": state["agentJson"],
          "messages": messages,
