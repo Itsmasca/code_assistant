@@ -19,3 +19,5 @@ class AgentRequest(BaseModel):
     agentJson: str
     input: str
 
+class ReactCodeGenerationRequest(BaseModel):
+    input: str
