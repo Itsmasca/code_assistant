@@ -14,7 +14,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
-    prompt = prompt_service.code_generation_prompt(state=state)
+    prompt = await prompt_service.code_generation_prompt(state=state)
 
     chain = prompt | llm
 
@@ -28,7 +28,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
-    prompt = prompt_service.code_revision_prompt(state=state)
+    prompt = await prompt_service.code_revision_prompt(state=state)
 
     chain = prompt | llm
 
