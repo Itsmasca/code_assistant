@@ -22,7 +22,7 @@ class AgentsController:
             "agentName": data.agentName,
             "improvedPrompt": data.improvedPrompt,
             "agentJson": data.agentJson,
-            "input": data.input,
+            "input": data.input
         }
         graph = create_graph()
         result = await graph.ainvoke(initial_state)

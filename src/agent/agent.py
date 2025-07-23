@@ -52,7 +52,8 @@ async def generate(state: GraphState):
          "improvedPrompt": improved_prompt,
          "agentJson": agent_json,
          "messages": messages,
-         "input": input}
+         "input": input},
+         "agentId": "test"
     )
     messages += [
         (
@@ -151,7 +152,8 @@ async def reflect(state: GraphState):
          "improvedPrompt": state["improvedPrompt"],
          "agentJson": state["agentJson"],
          "messages": messages,
-         "input": state["input"]
+         "input": state["input"],
+         "agentId": "test"
          }
     )
     messages += [("assistant", f"Here are reflections on the error: {reflections}")]
