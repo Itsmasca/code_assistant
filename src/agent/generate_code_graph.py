@@ -16,7 +16,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     prompt = prompt_service.code_generation_prompt(state=state)
 
-    chain = llm | prompt
+    chain = prompt | llm
 
     response = await chain.ainvoke({"input": state["input"]})
 
@@ -30,7 +30,7 @@ async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     prompt = prompt_service.code_revision_prompt(state=state)
 
-    chain = llm | prompt
+    chain = prompt | llm
 
     response = await chain.ainvoke({"code": state["generated_code"]})
 
