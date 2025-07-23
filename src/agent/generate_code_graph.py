@@ -21,6 +21,7 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
     response = await chain.ainvoke({"input": state["input"]})
 
     state["generated_code"] = response.content.strip()
+    print("GENERATE CODE STATE:::::::::::::", state)
 
     return state
 

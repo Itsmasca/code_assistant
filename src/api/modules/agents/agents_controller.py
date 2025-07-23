@@ -39,7 +39,7 @@ class AgentsController:
 
         final_state: GenerateCodeState = await graph.ainvoke(state)
 
-        return { "code": final_state["final_code"]}
+        return { "code": final_state["final_code"], "final_state": final_state}
     
      
 
