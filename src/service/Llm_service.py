@@ -11,6 +11,7 @@ from src.agent.state import GraphState
 from src.api.core.dependencies.container import Container
 load_dotenv
 ### Anthropic
+from src.api.core.decorators.service_error_handler import service_error_handler
 
 class code(BaseModel):
     """Schema for code solutions to questions about LCEL."""
@@ -24,6 +25,7 @@ class Llmservice:
         self.llm = ChatAnthropic(temperature=0.1, model="claude-opus-4-20250514", api_key= os.getenv("ANTROPHIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"}, max_tokens= 32000)  # or the maximum allowed
         self.structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
     # Optional: Check for errors in case tool use is flaky
+    @service_error_handler(module="claude.output.error")
     @staticmethod
     def check_claude_output(tool_output, config=None):
         # Error with parsing
@@ -40,7 +42,7 @@ class Llmservice:
                 "You did not use the provided tool! Be sure to invoke the tool to structure the output."
             )
         return tool_output
-
+    @service_error_handler(module="claude.code.error.inserts")
     def insert_errors(inputs):
 
         # Get errors
@@ -57,10 +59,10 @@ class Llmservice:
             "context": inputs["context"],
         }
 
-
+    @service_error_handler(module="claude.output.parse")
     def parse_output(self, solution, config=None):
         return solution["parsed"]
-
+    @service_error_handler(module="chain.claude.retrieve")
     async def retrieve_chain(self, state: GraphState = None) -> ChatPromptTemplate:
         # Chain with output check
         prompt_template: PromptService = Container.resolve("prompt_templates")

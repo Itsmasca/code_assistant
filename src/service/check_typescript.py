@@ -1,7 +1,8 @@
 import subprocess
 import tempfile
 import os
-
+from src.api.core.decorators.service_error_handler import service_error_handler
+@service_error_handler(module="check.typescript.error")
 def check_typescript(imports: str, code: str):
     """
     Compila (sin emitir) un archivo TS y lanza Exception si hay errores.

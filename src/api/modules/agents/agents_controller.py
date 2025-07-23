@@ -29,10 +29,10 @@ class AgentsController:
         generation = result.get("generation")
         return {
             "agentName": result.get("agentName", ""),
-            "generatiotn": {
-                "prefix": generation.prefix if generation else "",
-                "imports": generation.imports if generation else "",
-                "code": generation.code if generation else "",
+            "generation": {
+                "prefix": getattr(generation, "prefix", "") if generation else "",
+                "imports": getattr(generation, "imports", "") if generation else "",
+                "code": getattr(generation, "code", "") if generation else "",
             },
             "messages": result.get("messages", []),
     }

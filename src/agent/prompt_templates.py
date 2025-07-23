@@ -3,10 +3,11 @@ from langchain.schema import SystemMessage
 from src.service.Redis_service import RedisService
 from src.agent.state import GraphState
 from src.api.core.services.embedding_service import EmbeddingService
+from src.api.core.decorators.service_error_handler import service_error_handler
 class PromptService:
     def __init__(self, embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
-
+    @service_error_handler(module="prompt.templates.general_query")
     async def general_query_prompt_template(
             self, 
             state: GraphState

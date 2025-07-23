@@ -11,7 +11,7 @@ max_iterations = 3
 flag = "do not reflect"
 
 ### Nodes
-
+@service_error_handler(module="code.generation.error")
 async def generate(state: GraphState):
     """
     Generate a code solution
@@ -56,6 +56,11 @@ async def generate(state: GraphState):
          "agentId": "test"
          }
     )
+    print("=== CODE SOLUTION GENERATED ===")
+    print("Prefix:", getattr(code_solution, "prefix", ""))
+    print("Imports:", getattr(code_solution, "imports", ""))
+    print("Code:\n", getattr(code_solution, "code", ""))
+    print("================================")
     messages += [
         (
             "assistant",
@@ -66,7 +71,7 @@ async def generate(state: GraphState):
     # Increment
     iterations = iterations + 1
     return {"generation": code_solution, "messages": messages, "iterations": iterations}
-
+@service_error_handler(module="code.check.error")
 def code_check(state: GraphState):
     """
     Check code
@@ -123,7 +128,7 @@ def code_check(state: GraphState):
     }
 
 
-
+@service_error_handler(module="code.reflect.error")
 async def reflect(state: GraphState):
     """
     Reflect on errors
@@ -163,7 +168,7 @@ async def reflect(state: GraphState):
 
 
 ### Edges
-
+@service_error_handler(module="code.decision.error")
 def decide_to_finish(state: GraphState):
     """
     Determines whether to finish.
@@ -186,7 +191,7 @@ def decide_to_finish(state: GraphState):
             return "reflect"
         else:
             return "generate"
-        
+@service_error_handler(module="code.graph.create.error")        
 def create_graph():
     """
     Creates the graph for code generation.
