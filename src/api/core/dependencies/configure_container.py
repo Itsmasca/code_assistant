@@ -9,8 +9,6 @@ from src.api.core.services.request_validation_service import RequestValidationSe
 from src.api.core.services.http_service import HttpService
 from src.api.modules.users.users_dependencies import configure_users_dependencies
 from src.api.modules.agents.agents_dependencies import configure_agents_dependencies
-from src.api.modules.files.files_dependencies import configure_files_dependencies
-from src.api.modules.knowledge_base.knowledge_base_dependencies import configure_knowledge_base_dependencies
 from src.service.Qdrant import QdrantRetriever
 from src.service.Llm_service import Llmservice
 from src.api.core.services.embedding_service import EmbeddingService
@@ -70,12 +68,6 @@ def configure_container():
 
     # agents 
     configure_agents_dependencies(logger=logger)
-
-    # Files 
-    configure_files_dependencies(logger=logger)
-
-    # Knowledge base ...must configure files above this block
-    configure_knowledge_base_dependencies()
 
 
 
