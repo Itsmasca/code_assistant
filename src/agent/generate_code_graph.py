@@ -5,6 +5,7 @@ from langchain_anthropic import ChatAnthropic
 from src.agent.prompt_templates import PromptService
 from src.api.core.dependencies.container import Container
 from src.agent.state import GenerateCodeState
+import re
 
 
 
@@ -20,26 +21,40 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     response = await chain.ainvoke({"input": state["input"]})
 
-    state["generated_code"] = response.content.strip()
-    print("GENERATE CODE STATE:::::::::::::", state)
+    raw_code = response.content.strip()
+    clean_code = clean_escaped_jsx(raw_code)
+
+    state["generated_code"] = clean_code
 
     return state
 
 # revise code 
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
+    print("REVISING CODE::::::")
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
-    prompt = await prompt_service.code_revision_prompt(state=state)
+    prompt = await prompt_service.code_revision_prompt()
 
     chain = prompt | llm
 
     response = await chain.ainvoke({"code": state["generated_code"]})
 
-    state["final_code"] = response.content.strip()
+    raw_code = response.content.strip()
+    clean_code = clean_escaped_jsx(raw_code)
+
+    state["final_code"] = clean_code
 
     return state
 
+def clean_escaped_jsx(escaped_str: str) -> str:
+    # Remove code block markdown (```jsx ... ```)
+    match = re.search(r"```(?:jsx|js|tsx)?\n(.*?)```", escaped_str, re.DOTALL)
+    jsx_raw = match.group(1) if match else escaped_str
 
+    # Unescape characters like \n, \", etc.
+    cleaned = bytes(jsx_raw, "utf-8").decode("unicode_escape")
+
+    return cleaned.strip()
 
 def create_graph(llm: ChatAnthropic):
     graph = StateGraph(GenerateCodeState)
@@ -54,6 +69,7 @@ def create_graph(llm: ChatAnthropic):
     graph.add_node("revise_code", revise_code_node)
     graph.set_entry_point("generate_code")
 
+    graph.add_edge("generate_code", "revise_code")
     graph.add_edge("revise_code", END)
 
     return graph.compile()
