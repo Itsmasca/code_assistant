@@ -1,5 +1,5 @@
 from src.agent.agent import create_graph
-from src.agent.agent_model import AgentRequest, GenerateCode
+from src.agent.agent_model import AgentRequest, ReactCodeGenerationRequest
 from  src.agent.state import GraphState
 from src.agent.state import GenerateCodeState
 
@@ -30,7 +30,7 @@ class AgentsController:
             "messages": result.get("messages", []),
     }
 
-    async def prompted_react_code_generator(self, graph, data: GenerateCode):
+    async def prompted_react_code_generator(self, graph, data: ReactCodeGenerationRequest):
         state: GenerateCodeState =  {
             "input": data.input,
             "generated_code": None,

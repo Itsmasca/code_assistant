@@ -6,9 +6,6 @@ from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID, JSON
 
-class GenerateCode(BaseModel):
-    input: str
-
 class AgentCreate(BaseModel):
     agentName: str
     agentPrompt: str

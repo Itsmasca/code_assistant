@@ -4,12 +4,11 @@ from typing import List
 from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
-from src.api.modules.agents.agents_models import AgentCreate, AgentUpdate, AgentPublic, GenerateCode
 from src.api.modules.agents.agents_controller import AgentsController
 from src.api.core.services.http_service import HttpService
 import uuid
 from src.api.core.middleware.middleware_service import security
-from src.agent.agent_model import AgentRequest 
+from src.agent.agent_model import AgentRequest, ReactCodeGenerationRequest 
 from src.agent.generate_code_graph import create_graph
 from  src.service.Llm_service import Llmservice
 
@@ -37,7 +36,7 @@ async def generate_code(
 
 @router.post("/secure/react-code", status_code=200)
 async def generate_react_code(
-    data: GenerateCode = Body(...),
+    data: ReactCodeGenerationRequest = Body(...),
     controller: AgentsController = Depends(get_controller),
     graph = Depends(get_graph)
 ):
