@@ -51,7 +51,7 @@ def create_graph(llm: ChatAnthropic):
 
     graph.add_node("generate_code", generate_code_node)
     graph.add_node("revise_code", revise_code_node)
-    graph.set_entry_point("generate")
+    graph.set_entry_point("generate_code")
 
     graph.add_edge("revise_code", END)
 
