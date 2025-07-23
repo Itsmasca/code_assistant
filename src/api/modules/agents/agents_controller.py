@@ -1,6 +1,6 @@
 from src.api.core.services.http_service import HttpService
 from src.api.modules.agents.agents_service import AgentsService
-from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate, AgentToDB, Agent, GenerateCode
+from src.api.modules.agents.agents_models import AgentPublic, AgentCreate, AgentUpdate, AgentToDB, Agent
 from fastapi import BackgroundTasks, Depends, Body, Request, HTTPException, params
 from fastapi.responses import JSONResponse
 from src.api.core.services.http_service import HttpService
