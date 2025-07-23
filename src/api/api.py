@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.modules.users import users_routes
 from src.api.modules.agents import agents_routes
 from src.api.modules.knowledge_base import knowledge_base_routes
-
+from src.api.modules.chats.messages import messages_routes
+from src.api.modules.chats import chats_router
 from src.api.core.dependencies.configure_container import configure_container
 
 @asynccontextmanager
@@ -22,9 +23,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(users_routes.router)
+
 app.include_router(agents_routes.router)
+app.include_router(chats_router.router)
 app.include_router(knowledge_base_routes.router)
+app.include_router(messages_routes.router)
+app.include_router(users_routes.router)
+
 
 
 

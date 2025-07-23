@@ -30,7 +30,6 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
 # revise code 
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
-    print("REVISING CODE::::::")
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
     prompt = await prompt_service.code_revision_prompt()
@@ -47,11 +46,9 @@ async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
     return state
 
 def clean_escaped_jsx(escaped_str: str) -> str:
-    # Remove code block markdown (```jsx ... ```)
     match = re.search(r"```(?:jsx|js|tsx)?\n(.*?)```", escaped_str, re.DOTALL)
     jsx_raw = match.group(1) if match else escaped_str
 
-    # Unescape characters like \n, \", etc.
     cleaned = bytes(jsx_raw, "utf-8").decode("unicode_escape")
 
     return cleaned.strip()
@@ -60,7 +57,7 @@ def create_graph(llm: ChatAnthropic):
     graph = StateGraph(GenerateCodeState)
 
     async def generate_code_node(state):
-        return await generate_code(state=state, llm=llm, )
+        return await generate_code(state=state, llm=llm)
     
     async def revise_code_node(state):
         return await revise_code(state=state, llm=llm)
