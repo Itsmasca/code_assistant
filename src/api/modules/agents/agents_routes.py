@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request, HTTPException,UploadFile, File
+from fastapi import APIRouter, BackgroundTasks, Depends, Body
 from src.api.core.dependencies.container import Container
 from typing import List
 from src.api.core.middleware.auth_middleware import auth_middleware
@@ -11,6 +11,7 @@ import uuid
 from src.api.core.middleware.middleware_service import security
 from src.agent.agent_model import AgentRequest 
 from src.agent.generate_code_graph import create_graph
+from  src.service.Llm_service import Llmservice
 
 router = APIRouter(
     prefix="/agents",
@@ -20,6 +21,11 @@ router = APIRouter(
 
 def get_controller():
     return Container.resolve("agents_controller")
+
+def  get_graph():
+    llm_service: Llmservice = Container.resolve("llm_service")
+    llm = llm_service.llm
+    return create_graph(llm=llm)
 
 @router.post("/secure/generate-code", status_code=200)
 async def generate_code(
@@ -33,7 +39,7 @@ async def generate_code(
 async def generate_react_code(
     data: GenerateCode = Body(...),
     controller: AgentsController = Depends(get_controller),
-    graph = Depends(create_graph)
+    graph = Depends(get_graph)
 ):
     return controller.prompted_react_code_generator(graph=graph, data=data)
     

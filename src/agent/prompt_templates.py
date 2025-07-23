@@ -4,7 +4,7 @@ from src.service.Redis_service import RedisService
 from src.agent.state import GraphState
 from src.api.core.services.embedding_service import EmbeddingService
 from src.api.core.decorators.service_error_handler import service_error_handler
-from src.agent.generate_code_graph import GenerateCodeState
+from src.agent.state import GenerateCodeState
 
 
 class PromptService:
