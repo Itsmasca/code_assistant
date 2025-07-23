@@ -40,7 +40,7 @@ async def generate_react_code(
     controller: AgentsController = Depends(get_controller),
     graph = Depends(get_graph)
 ):
-    return controller.prompted_react_code_generator(graph=graph, data=data)
+    return await controller.prompted_react_code_generator(graph=graph, data=data)
     
     
 
