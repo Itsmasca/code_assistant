@@ -2,9 +2,7 @@ from src.api.modules.users.users_models import UserPublic, User, UserUpdate, Use
 from src.api.core.repository.base_repository import BaseRepository
 from src.api.core.dependencies.container import Container
 from src.api.core.services.encryption_service import EncryptionService
-import logging
 from src.api.core.logs.logger import Logger
-from typing import Dict, Any
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.api.core.decorators.service_error_handler import service_error_handler

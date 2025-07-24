@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
+from fastapi import APIRouter, Depends, Body, Request
 from src.api.core.dependencies.container import Container
 from src.api.core.middleware.auth_middleware import auth_middleware
 from src.api.core.middleware.verification_middleware import verification_middleware
