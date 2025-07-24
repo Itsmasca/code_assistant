@@ -1,5 +1,5 @@
 from src.api.modules.chats.messages.messages_models import Message, MessageCreate
-from src.api.core.repository.base_repository import BaseRepository
+from src.api.modules.chats.messages.messages_repository import MessagesRepository
 import logging
 from src.api.core.logs.logger import Logger
 from typing import Dict, Any, List
@@ -9,13 +9,13 @@ from src.api.core.decorators.service_error_handler import service_error_handler
 
 class MessagesService():
     _MODULE = "messages.service"
-    def __init__(self, logger: Logger, repository: BaseRepository):
-        self._repository: BaseRepository = repository
+    def __init__(self, logger: Logger, repository: MessagesRepository):
+        self._repository: MessagesRepository = repository
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  message: MessageCreate) -> Message:
-        return self._repository.create(db=db, data=Message(**message.model_dump(by_alias=False)))
+    def create_many(self, db: Session,  messages: List[MessageCreate]) -> Message:
+        return self._repository.create_many(db=db, data=[Message(**message.model_dump(by_alias=False)) for message in messages])
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, message_id: UUID) -> Message | None:
@@ -39,5 +39,20 @@ class MessagesService():
     @service_error_handler(module=_MODULE)
     def delete(self, db: Session, message_id: UUID)-> Message:
         return self._repository.delete(db=db, key="message_id", value=message_id)
+    
+    def handle_messages(self, db: Session, chat_id: UUID, human_message: str, ai_message: str): 
+        incoming_message = MessageCreate(
+            chat_id=chat_id,
+            sender="user",
+            text=human_message
+        )
+
+        outgoing_message = MessageCreate(
+            chat_id=chat_id,
+            sender="ai",
+            text=ai_message
+        )
+
+        return self.create_many(db=db, messages=[incoming_message, outgoing_message])
     
     

@@ -6,9 +6,9 @@ from src.api.core.services.http_service import HttpService
 from src.api.modules.users.users_service import UsersService
 from src.api.modules.users.users_controller import UsersController
 
-def configure_users_dependencies(logger: Logger):
+def configure_users_dependencies(logger: Logger, http_service: HttpService):
     repository = BaseRepository(model=User)
-    http_service: HttpService = Container.resolve("http_service")
+
     service = UsersService(
         logger=logger,
         repository=repository

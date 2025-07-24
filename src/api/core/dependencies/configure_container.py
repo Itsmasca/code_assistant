@@ -9,6 +9,8 @@ from src.api.core.services.request_validation_service import RequestValidationSe
 from src.api.core.services.http_service import HttpService
 from src.api.modules.users.users_dependencies import configure_users_dependencies
 from src.api.modules.agents.agents_dependencies import configure_agents_dependencies
+from src.api.modules.chats.messages.message_dependencies import configure_messages_dependencies
+from src.api.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.service.Qdrant import QdrantRetriever
 from src.service.Llm_service import Llmservice
 from src.api.core.services.embedding_service import EmbeddingService
@@ -63,11 +65,19 @@ def configure_container():
     )
     Container.register("middleware_service", middleware_service)
 
-    # users 
-    configure_users_dependencies(logger=logger)
 
     # agents 
     configure_agents_dependencies(logger=logger)
+
+    # chats
+    configure_chats_dependencies(logger=logger, http_service=http_service)
+
+    # messages
+    configure_messages_dependencies(logger=logger, http_service=http_service)
+
+    
+    # users 
+    configure_users_dependencies(logger=logger, http_service=http_service)
 
 
 
