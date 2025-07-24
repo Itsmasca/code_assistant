@@ -3,6 +3,7 @@ from sqlalchemy import Column, String, Text, ForeignKey
 from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+from typing import Optional
 
 class ChatCreate(BaseModel):
     user_id: uuid.UUID
@@ -13,7 +14,7 @@ class ChatUpdate(BaseModel):
 class ChatPublic(BaseModel):
     chatId: uuid.UUID = Field(..., alias="chat_id")
     userId: uuid.UUID = Field(..., alias="user_id")
-    title: str
+    title: Optional[str] = None
 
     model_config = {
         "from_attributes": True,

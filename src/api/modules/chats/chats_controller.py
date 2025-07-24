@@ -34,4 +34,4 @@ class ChatsController:
    
     @staticmethod
     def __to_public(message: Chat) -> ChatPublic:
-        return ChatPublic.model_validate(message)
+        return ChatPublic.model_validate(message, by_name=True)

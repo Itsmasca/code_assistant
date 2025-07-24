@@ -32,7 +32,9 @@ def get_auth_headers():
 #         )
 
 #         assert response.status_code == 201
-#         assert response.json() == {"detail": "Agent created"}
+#   
+#       assert response.json() == {}
+
 
 
 # def test_delete_agent():
@@ -40,4 +42,12 @@ def get_auth_headers():
 #         response = client.delete(f"agents/secure/efbbc155-dfdc-45da-b166-8414d3e4b948", headers=get_auth_headers())
 #         assert response.status_code == 200
 #         assert response.json() == {"detail": "Agent deleted"}
+
+
+def test_collection():
+    with TestClient(app) as client:
+        response = client.get("/chats/secure/collection", headers=get_auth_headers())
+        
+        print(response.json(), "RES::::")
+        assert response.status_code == 200
 

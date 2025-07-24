@@ -29,13 +29,13 @@ def secure_create(
     return controller.create_request(request=request, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
-async def secure_collection( 
+def secure_collection( 
     request: Request,
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
     controller: ChatsController = Depends(get_controller)
 ):
-    return await controller.collection_request(request=request, db=db)
+    return controller.collection_request(request=request, db=db)
 
 
     
