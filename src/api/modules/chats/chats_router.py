@@ -17,10 +17,19 @@ router = APIRouter(
 )
 
 def get_controller() -> ChatsController:
-    return Container.resolve("messages_controller")
+    return Container.resolve("chats_controller")
+
+@router.post("/secure/create", status_code=201)
+def secure_create(
+    request: Request,
+    _=Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: ChatsController = Depends(get_controller)
+):
+    return controller.create_request(request=request, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
-async def generate_code( 
+async def secure_collection( 
     request: Request,
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),

@@ -6,8 +6,9 @@ from sqlalchemy.dialects.postgresql import UUID
 
 class ChatCreate(BaseModel):
     user_id: uuid.UUID
-    title: str
 
+class ChatUpdate(BaseModel):
+    title: uuid.UUID
 
 class ChatPublic(BaseModel):
     chatId: uuid.UUID = Field(..., alias="chat_id")

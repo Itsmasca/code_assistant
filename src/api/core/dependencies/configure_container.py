@@ -75,7 +75,6 @@ def configure_container():
     # messages
     configure_messages_dependencies(logger=logger, http_service=http_service)
 
-    
     # users 
     configure_users_dependencies(logger=logger, http_service=http_service)
 

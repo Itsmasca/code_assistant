@@ -2,7 +2,7 @@
 from functools import wraps
 import logging
 from typing import Callable, Any
-from api.core.logs.logger import Logger
+from src.api.core.logs.logger import Logger
 import asyncio
 import logging
 from functools import wraps

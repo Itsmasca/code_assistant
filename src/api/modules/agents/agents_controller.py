@@ -2,9 +2,12 @@ from src.agent.agent import create_graph
 from src.agent.agent_model import AgentRequest, ReactCodeGenerationRequest
 from  src.agent.state import GraphState
 from src.agent.state import GenerateCodeState
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, Request
 from src.api.core.dependencies.container import Container
 from src.api.modules.chats.messages.messages_service import MessagesService
+from sqlalchemy.orm import Session
+from src.api.modules.users.users_models import User
+
 
 class AgentsController:
     async def prompted_code_generator(self, data: AgentRequest):
@@ -32,7 +35,9 @@ class AgentsController:
     }
     
 
-    async def prompted_react_code_generator(self, graph, data: ReactCodeGenerationRequest):
+    async def prompted_react_code_generator(self, request: Request, db: Session, graph, data: ReactCodeGenerationRequest):
+        user: User = request.state.user
+
         state: GenerateCodeState =  {
             "input": data.input,
             "generated_code": None,
@@ -47,7 +52,7 @@ class AgentsController:
         messages_service: MessagesService = Container.resolve("messages_service")
         BackgroundTasks.add_task(messages_service.handle_messages, human_message, ai_message)
         
-        return { "code": final_state["final_code"]}
+        return { "data": final_state["final_code"]}
     
      
 

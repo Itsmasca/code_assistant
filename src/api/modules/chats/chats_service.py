@@ -14,8 +14,8 @@ class ChatsService():
         self._logger = logger
 
     @service_error_handler(module=_MODULE)
-    def create(self, db: Session,  agent: ChatCreate) -> Chat:
-        return self._repository.create(db=db, data=Chat(**agent.model_dump(by_alias=False)))
+    def create(self, db: Session,  chat: ChatCreate) -> Chat:
+        return self._repository.create(db=db, data=Chat(**chat.model_dump(by_alias=False)))
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, chat_id: UUID) -> Chat | None:
