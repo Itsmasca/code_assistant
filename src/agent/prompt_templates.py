@@ -248,7 +248,8 @@ class PromptService:
  
         if context:
             messages.append(SystemMessage(content=f"""
-                You have access to the following relevant context retrieved from documents. Use this information to inform your response. Do not make up facts outside of this context.
+                You have access to the following relevant context retrieved from documents. Use this information to inform your response.
+                Do not make up facts outside of this context.
 
                 Relevant context:
                 {context}
@@ -270,13 +271,19 @@ class PromptService:
             SystemMessage(content=""""
                 You are the second node in a multi-agent system.
 
-                Your job is to improve and fix a React + Tailwind component, or page.
-                
-                Do not Explain your answer just revise the code and fix the code if necessary 
+            Your task is to analyze and revise a React + Tailwind component or page.
+
+            - If the code is correct and no changes are required, respond only with: UNCHANGED
+            - If the code has issues, return the full corrected version inside a code block.
+            
+            Do not add explanations, notes, or anything outside of the response format.
+            Return only one of the following:
+            1. The string "UNCHANGED"
+            2. A full revised code snippet
             """)
         ]
 
-        messages.append(HumanMessagePromptTemplate.from_template('Check this code and fix any errors, if no errors simply return the code as is {code}'))
+        messages.append(HumanMessagePromptTemplate.from_template('Check this code: {code}'))
  
         prompt = ChatPromptTemplate.from_messages(messages)
         

@@ -19,7 +19,6 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
     chain = prompt | llm
 
     response = await chain.ainvoke({"input": state["input"]})
-    print(response, "RESPONSE NODE 2:::::")
 
     raw_code = response.content.strip()
     clean_code = clean_escaped_jsx(raw_code)
@@ -38,12 +37,15 @@ async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
 
     response = await chain.ainvoke({"code": state["generated_code"]})
 
-    print(response, "RESPONSE NODE 2:::::")
-
     raw_code = response.content.strip()
-    clean_code = clean_escaped_jsx(raw_code)
+    
+    if raw_code == 'UNCHANGED':
+        state["final_code"] = state["generated_code"]
+    
+    else: 
+        clean_code = clean_escaped_jsx(raw_code)
 
-    state["final_code"] = clean_code
+        state["final_code"] = clean_code
 
     return state
 
