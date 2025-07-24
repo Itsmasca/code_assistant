@@ -11,6 +11,7 @@ from src.api.core.middleware.middleware_service import security
 from src.agent.agent_model import AgentRequest, ReactCodeGenerationRequest 
 from src.agent.generate_code_graph import create_graph
 from  src.service.Llm_service import Llmservice
+from langchain_openai import ChatOpenAI
 
 router = APIRouter(
     prefix="/agents",
@@ -23,7 +24,11 @@ def get_controller():
 
 def  get_graph():
     llm_service: Llmservice = Container.resolve("llm_service")
-    llm = llm_service.llm
+    # llm = llm_service.llm
+    llm = ChatOpenAI(
+            model="gpt-4o",
+            temperature=0.5
+        )
     return create_graph(llm=llm)
 
 @router.post("/secure/generate-code", status_code=200)
