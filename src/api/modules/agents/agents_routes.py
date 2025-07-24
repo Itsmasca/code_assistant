@@ -24,11 +24,7 @@ def get_controller():
 
 def  get_graph():
     llm_service: Llmservice = Container.resolve("llm_service")
-    # llm = llm_service.llm
-    llm = ChatOpenAI(
-            model="gpt-4o",
-            temperature=0.5
-        )
+    llm = llm_service.llm
     return create_graph(llm=llm)
 
 @router.post("/secure/generate-code", status_code=200)
