@@ -22,7 +22,7 @@ class code(BaseModel):
 # Prompt to enforce tool use
 class Llmservice:
     def __init__(self):
-        self.llm = ChatAnthropic(temperature=0.1, model="claude-opus-4-20250514", api_key= os.getenv("ANTROPHIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"}, max_tokens= 32000)  # or the maximum allowed
+        self.llm = ChatAnthropic(temperature=0.1, model="claude-sonnet-3-20240229", api_key= os.getenv("ANTROPHIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"}, max_tokens= 32000)  # or the maximum allowed
         self.structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
     # Optional: Check for errors in case tool use is flaky
     @service_error_handler(module="claude.output.error")
