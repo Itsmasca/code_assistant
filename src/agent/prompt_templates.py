@@ -267,6 +267,8 @@ class PromptService:
         context = await self.embedding_service.search_for_context(
             input=state["input"]
         )
+
+        print("Got context")
  
         if context:
             messages.append(SystemMessage(content=f"""
