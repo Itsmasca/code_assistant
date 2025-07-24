@@ -12,17 +12,14 @@ import re
 # generate code 
 
 async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
-    print("Entered node 1")
-
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
     prompt = await prompt_service.code_generation_prompt(state=state)
 
     chain = prompt | llm
-    print("node 1 chain ready")
 
     response = await chain.ainvoke({"input": state["input"]})
-    print("node 1 recieved repsonse")
+    print(response, "RESPONSE NODE 2:::::")
 
     raw_code = response.content.strip()
     clean_code = clean_escaped_jsx(raw_code)
@@ -33,18 +30,15 @@ async def generate_code(state: GenerateCodeState, llm: ChatAnthropic):
 
 # revise code 
 async def revise_code(state: GenerateCodeState, llm: ChatAnthropic):
-    print("entered node 2 ")
     prompt_service: PromptService = Container.resolve("prompt_templates")
 
     prompt = await prompt_service.code_revision_prompt()
 
     chain = prompt | llm
 
-    print("node 2 chain ready")
-
     response = await chain.ainvoke({"code": state["generated_code"]})
 
-    print("response recieved")
+    print(response, "RESPONSE NODE 2:::::")
 
     raw_code = response.content.strip()
     clean_code = clean_escaped_jsx(raw_code)
