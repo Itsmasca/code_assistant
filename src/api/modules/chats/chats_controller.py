@@ -18,13 +18,11 @@ class ChatsController:
     def create_request(self, request: Request, db: Session):
         user: User = request.state.user
 
-        chat = ChatCreate(
+        chat = self._chats_service.create(db=db, chat=ChatCreate(
             user_id=user.user_id
-        )
+        ))
 
-        self._chats_service.create(db=db, chat=chat)
-
-        return {"detail": "Chat created"}
+        return chat.chat_id
  
     def collection_request(self, request: Request, db: Session):
         user: User = request.state.user
