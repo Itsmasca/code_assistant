@@ -39,5 +39,3 @@ class ChatsService():
     @service_error_handler(module=_MODULE)
     def delete(self, db: Session, chat_id: UUID)-> Chat:
         return self._repository.delete(db=db, key="chat_id", value=chat_id)
-    
-    
