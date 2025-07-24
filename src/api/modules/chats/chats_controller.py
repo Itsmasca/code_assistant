@@ -19,8 +19,6 @@ class ChatsController:
 
         data = self._chats_service.collection(db=db, user_id=user.user_id)
         
-      
-
         return [self.__to_public(chat) for chat in data]
         
    
