@@ -112,13 +112,13 @@ class Llmservice:
             chat_history = session_data.get("chat_history", [])
         else:
             messages_service: MessagesService = Container.resolve("messages_service")
-            chat_history = messages_service.collection(db=db, chat_id=chat_id)
+            chat_history: List[Message] = messages_service.collection(db=db, chat_id=chat_id)[:num_of_messages]
            
             await self._redis_service.set_session(session_key, {
                 "chat_history": chat_history
             }, expire_seconds=7200)  # 2 hours
 
         if len(chat_history) != 0:
-            return chat_history[:num_of_messages]
+            return chat_history
         
         return None

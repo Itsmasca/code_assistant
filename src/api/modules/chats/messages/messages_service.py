@@ -46,7 +46,7 @@ class MessagesService():
     async def handle_messages(self, db: Session, redis_service: RedisService, chat_id: UUID, human_message: str, ai_message: str, num_of_messages: int = 12): 
         incoming_message = MessageCreate(
             chat_id=chat_id,
-            sender="user",
+            sender="human",
             text=human_message
         )
 
@@ -60,11 +60,11 @@ class MessagesService():
         session = await redis_service.get_session(session_key)
         chat_history = session.get("chat_history", [])
 
-        chat_history.insert(0, outgoing_message)
+        chat_history.insert(0, outgoing_message.model_dump(exclude="chat_id"))
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
 
-        chat_history.insert(0, incoming_message)
+        chat_history.insert(0, incoming_message.model_dump(exclude="chat_id"))
         if len(chat_history) > num_of_messages:
             chat_history.pop()  
         
