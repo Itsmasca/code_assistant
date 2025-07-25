@@ -43,7 +43,7 @@ class MessagesService():
     def delete(self, db: Session, message_id: UUID)-> Message:
         return self._repository.delete(db=db, key="message_id", value=message_id)
     
-    def handle_messages(self, db: Session, redis_service: RedisService, chat_id: UUID, human_message: str, ai_message: str, num_of_messages: int = 12): 
+    async def handle_messages(self, db: Session, redis_service: RedisService, chat_id: UUID, human_message: str, ai_message: str, num_of_messages: int = 12): 
         incoming_message = MessageCreate(
             chat_id=chat_id,
             sender="user",
@@ -57,7 +57,7 @@ class MessagesService():
         )
 
         session_key = redis_service.get_chat_history_key(chat_id=chat_id)
-        session = redis_service.get_session(session_key)
+        session = await redis_service.get_session(session_key)
         chat_history = session.get("chat_history", [])
 
         chat_history.insert(0, outgoing_message.model_dump())
@@ -70,7 +70,7 @@ class MessagesService():
         
         self.create_many(db=db, messages=[incoming_message, outgoing_message])
         
-        redis_service.set_session(session_key, {
+        await redis_service.set_session(session_key, {
             "chat_history": chat_history
         }, expire_seconds=7200) #2 hours 
     

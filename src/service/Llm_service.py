@@ -103,10 +103,10 @@ class Llmservice:
 
    
     @log_exceptions("llm_service.chat_history")
-    def get_agent_chat_history(self, db: Session, chat_id: uuid.UUID, num_of_messages: int = 12) -> List[Message]:
+    async def get_agent_chat_history(self, db: Session, chat_id: uuid.UUID, num_of_messages: int = 12) -> List[Message]:
         session_key = self._redis_service.get_chat_history_key(chat_id=chat_id)
     
-        session_data = self._redis_service.get_session(session_key)
+        session_data = await self._redis_service.get_session(session_key)
         
         if session_data:
             chat_history = session_data.get("chat_history", [])
@@ -114,7 +114,7 @@ class Llmservice:
             messages_service: MessagesService = Container.resolve("messages_service")
             chat_history = messages_service.collection(db=db, chat_id=chat_id)
            
-            self._redis_service.set_session(session_key, {
+            await self._redis_service.set_session(session_key, {
                 "chat_history": chat_history
             }, expire_seconds=7200)  # 2 hours
 

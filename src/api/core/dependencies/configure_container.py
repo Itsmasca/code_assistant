@@ -12,13 +12,14 @@ from src.api.modules.agents.agents_dependencies import configure_agents_dependen
 from src.api.modules.chats.messages.message_dependencies import configure_messages_dependencies
 from src.api.modules.chats.chats_dependencies import configure_chats_dependencies
 from src.service.Qdrant import QdrantRetriever
-from src.service.Llm_service import Llmservice
 from src.api.core.services.embedding_service import EmbeddingService
 from src.agent.prompt_templates import PromptService
 from  src.service.Redis_service import RedisService
 
 def configure_container():
-    # core  
+    ## Core ##  
+
+    ## independent services ##
     email_service = EmailService()
     Container.register("email_service", email_service)
 
@@ -46,8 +47,8 @@ def configure_container():
     webtoken_service = WebTokenService()
     Container.register("webtoken_service", webtoken_service)
 
-    
-    
+    ## dependent services ## must configure independent services above this line ##
+
     # http 
     http_service = HttpService(
         encryption_service=encryption_service,
@@ -70,7 +71,8 @@ def configure_container():
     )
     Container.register("prompt_templates", prompt_templates)
    
-   
+   ## Module ## must configure core dependencies above this line ##
+    
     # agents 
     configure_agents_dependencies(
         logger=logger,
