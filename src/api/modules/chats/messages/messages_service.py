@@ -6,6 +6,7 @@ from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from uuid import UUID
 from src.api.core.decorators.service_error_handler import service_error_handler
+from operator import attrgetter
 
 class MessagesService():
     _MODULE = "messages.service"
@@ -29,7 +30,7 @@ class MessagesService():
         result = self._repository.get_many(db=db, key="chat_id", value=chat_id)
 
         if len(result) != 0:
-            return result
+            return sorted(result, key=attrgetter("created_at"), reverse=True)
         return []
     
     @service_error_handler(module=_MODULE)

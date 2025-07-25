@@ -8,6 +8,7 @@ from src.agent.generate_code_graph import create_graph
 from src.service.Llm_service import Llmservice
 from src.api.core.database.sessions import get_db_session
 from sqlalchemy.orm import Session
+import uuid 
 
 
 router = APIRouter(
@@ -32,8 +33,9 @@ async def generate_code(
 ):
     return await controller.prompted_code_generator(data=data)
 
-@router.post("/secure/react-code", status_code=200)
+@router.post("/secure/react-code/{chat_id}", status_code=200)
 async def generate_react_code(
+    chat_id: uuid.UUID,
     request: Request,
     data: ReactCodeGenerationRequest = Body(...),
     _=Depends(auth_middleware),
@@ -41,7 +43,7 @@ async def generate_react_code(
     controller: AgentsController = Depends(get_controller),
     graph = Depends(get_graph)
 ):
-    return await controller.prompted_react_code_generator(request=request, db=db, graph=graph, data=data)
+    return await controller.prompted_react_code_generator(request=request, db=db, graph=graph, chat_id=chat_id, data=data)
     
     
 

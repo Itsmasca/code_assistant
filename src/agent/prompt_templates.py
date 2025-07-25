@@ -1,5 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate,  AIMessagePromptTemplate, SystemMessagePromptTemplate
-from langchain.schema import SystemMessage
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from src.service.Redis_service import RedisService
 from src.agent.state import GraphState
 from src.api.core.services.embedding_service import EmbeddingService
@@ -219,24 +219,20 @@ class PromptService:
         messages = [
             SystemMessage(content="""
                 You are a senior front-end engineer expert in React and Tailwind CSS. Your task is to generate clean, production-ready React components, or pages based on user input.
-
                 You always:
                 - Use **functional React components**
                 - Style only with **Tailwind utility classes**
                 - Follow best practices: responsive, accessible (ARIA), semantic HTML
                 - Ensure components are **modular, reusable, and syntactically valid**
                 - Avoid external libraries unless explicitly required
-
                 Input types:
                 - Feature descriptions (e.g. "Build a navbar with CTA")
                 - Modification requests (e.g. "Make this layout responsive")
                 - Raw code that needs cleanup or improvement
-
                 Output format:
                 - Return only a complete code block (React JSX)
                 - No explanations unless inside code comments
                 - Use comments in the same language as the input
-
                 """)
         ]
 
@@ -244,23 +240,26 @@ class PromptService:
             input=state["input"]
         )
 
-        print("Got context")
- 
         if context:
             messages.append(SystemMessage(content=f"""
                 You have access to the following relevant context retrieved from documents. Use this information to inform your response.
                 Do not make up facts outside of this context.
-
                 Relevant context:
                 {context}
             """))
 
+        if state.get("chat_history"):
+            chat_history = state["chat_history"]
+            for msg in chat_history:
+                if msg.sender == "human":
+                    messages.append(HumanMessage(content=msg.text))
+                elif msg.sender == "ai":
+                    messages.append(AIMessage(content=msg.text))
         
         messages.append(HumanMessagePromptTemplate.from_template('{input}'))
 
         prompt = ChatPromptTemplate.from_messages(messages)
         
-        # Carga de todas las variables para el prompt
         return prompt
     
 
@@ -270,16 +269,13 @@ class PromptService:
         messages = [
             SystemMessage(content=""""
                 You are the second node in a multi-agent system.
-
-            Your task is to analyze and revise a React + Tailwind component or page.
-
-            - If the code is correct and no changes are required, respond only with: UNCHANGED
-            - If the code has issues, return the full corrected version inside a code block.
-            
-            Do not add explanations, notes, or anything outside of the response format.
-            Return only one of the following:
-            1. The string "UNCHANGED"
-            2. A full revised code snippet
+                Your task is to analyze and revise a React + Tailwind component or page.
+                - If the code is correct and no changes are required, respond only with: UNCHANGED
+                - If the code has issues, return the full corrected version inside a code block.
+                Do not add explanations, notes, or anything outside of the response format.
+                Return only one of the following:
+                1. The string "UNCHANGED"
+                2. A full revised code snippet
             """)
         ]
 
@@ -287,5 +283,4 @@ class PromptService:
  
         prompt = ChatPromptTemplate.from_messages(messages)
         
-        # Carga de todas las variables para el prompt
         return prompt

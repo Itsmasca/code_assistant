@@ -67,7 +67,7 @@ def configure_container():
 
 
     # agents 
-    configure_agents_dependencies(logger=logger)
+    configure_agents_dependencies(http_service=http_service, llm_service=llm_service)
 
     # chats
     configure_chats_dependencies(logger=logger, http_service=http_service)

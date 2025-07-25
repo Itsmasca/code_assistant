@@ -1,6 +1,7 @@
 from typing import List
 from typing_extensions import TypedDict
-from  pydantic import BaseModel
+from src.api.modules.chats.messages.messages_models import Message
+import uuid
 
 
 class GraphState(TypedDict):
@@ -16,5 +17,6 @@ class GraphState(TypedDict):
 
 class GenerateCodeState(TypedDict):
     input: str
+    chat_history: List[Message]
     generated_code: str
     final_code: str
