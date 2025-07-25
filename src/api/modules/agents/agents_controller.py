@@ -42,7 +42,15 @@ class AgentsController:
     }
     
 
-    async def prompted_react_code_generator(self, request: Request, db: Session, graph, chat_id: uuid.UUID, data: ReactCodeGenerationRequest, background_tasks: BackgroundTasks):
+    async def prompted_react_code_generator(
+        self, 
+        request: Request, 
+        db: Session, 
+        graph, 
+        chat_id: uuid.UUID, 
+        data: ReactCodeGenerationRequest, 
+        background_tasks: BackgroundTasks
+    ):
         user: User = request.state.user
 
         chat_resource: Chat = self._http_service.request_validation_service.verify_resource(

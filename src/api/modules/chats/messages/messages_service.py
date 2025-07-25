@@ -16,7 +16,7 @@ class MessagesService():
 
     @service_error_handler(module=_MODULE)
     def create_many(self, db: Session,  messages: List[MessageCreate]) -> Message:
-        return self._repository.create_many(db=db, data=[Message(**message.model_dump(by_alias=False)) for message in messages])
+        return self._repository.create_many(db=db, messages=[Message(**message.model_dump(by_alias=False)) for message in messages])
 
     @service_error_handler(module=_MODULE)
     def resource(self, db: Session, message_id: UUID) -> Message | None:
