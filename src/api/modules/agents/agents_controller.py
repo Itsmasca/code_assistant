@@ -42,7 +42,7 @@ class AgentsController:
     }
     
 
-    async def prompted_react_code_generator(self, request: Request, db: Session, graph, chat_id: uuid.UUID, data: ReactCodeGenerationRequest):
+    async def prompted_react_code_generator(self, request: Request, db: Session, graph, chat_id: uuid.UUID, data: ReactCodeGenerationRequest, background_tasks: BackgroundTasks):
         user: User = request.state.user
 
         chat_resource: Chat = self._http_service.request_validation_service.verify_resource(
@@ -68,7 +68,7 @@ class AgentsController:
         ai_message = final_state["final_code"]
 
         messages_service: MessagesService = Container.resolve("messages_service")
-        BackgroundTasks.add_task(messages_service.handle_messages, db, chat_id, human_message, ai_message)
+        background_tasks.add_task(messages_service.handle_messages, db, chat_id, human_message, ai_message)
         
         return { "data": final_state["final_code"]}
     

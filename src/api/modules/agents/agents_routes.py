@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, Request
+from fastapi import APIRouter, Depends, Body, Request, BackgroundTasks
 from src.api.core.dependencies.container import Container
 from src.api.core.middleware.auth_middleware import auth_middleware
 from src.api.modules.agents.agents_controller import AgentsController
@@ -37,13 +37,21 @@ async def generate_code(
 async def generate_react_code(
     chat_id: uuid.UUID,
     request: Request,
+    background_tasks: BackgroundTasks,
     data: ReactCodeGenerationRequest = Body(...),
     _=Depends(auth_middleware),
     db: Session = Depends(get_db_session),
     controller: AgentsController = Depends(get_controller),
     graph = Depends(get_graph)
 ):
-    return await controller.prompted_react_code_generator(request=request, db=db, graph=graph, chat_id=chat_id, data=data)
+    return await controller.prompted_react_code_generator(
+        request=request, 
+        db=db, 
+        graph=graph, 
+        chat_id=chat_id, 
+        data=data, 
+        background_tasks=background_tasks
+    )
     
     
 
