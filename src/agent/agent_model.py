@@ -20,4 +20,3 @@ class AgentRequest(BaseModel):
 
 class ReactCodeGenerationRequest(BaseModel):
     input: str
-    chatId: str
