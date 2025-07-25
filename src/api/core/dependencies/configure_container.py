@@ -35,20 +35,6 @@ def configure_container():
     hashing_service = HashingService()
     Container.register("hashing_service", hashing_service)
 
-    http_service = HttpService(
-        encryption_service=encryption_service,
-        logger=logger,
-        hashing_service = hashing_service,
-        request_validation_service=request_validatation_service,
-        webtoken_service=webtoken_service
-    )
-    Container.register("http_service", http_service)
-
-    middleware_service = MiddlewareService(
-        http_service=http_service
-    )
-    Container.register("middleware_service", middleware_service)
-
     prompt_templates = PromptService(
         embedding_service=embeddings_service
     )
@@ -65,7 +51,21 @@ def configure_container():
 
     retriever_service = QdrantRetriever()
     Container.register("retriever_service", retriever_service)
+    
+    # http 
+    http_service = HttpService(
+        encryption_service=encryption_service,
+        logger=logger,
+        hashing_service = hashing_service,
+        request_validation_service=request_validatation_service,
+        webtoken_service=webtoken_service
+    )
+    Container.register("http_service", http_service)
 
+    middleware_service = MiddlewareService(
+        http_service=http_service
+    )
+    Container.register("middleware_service", middleware_service)
 
     # agents 
     configure_agents_dependencies(
