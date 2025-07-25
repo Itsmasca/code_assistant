@@ -51,7 +51,7 @@ class AgentsController:
             not_found_message="Chat not found"
         )
 
-        self._http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource, chat_resource.user_id)
+        self._http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
 
         chat_history = self._llm_service.get_agent_chat_history(db=db, chat_id=chat_id)
 
