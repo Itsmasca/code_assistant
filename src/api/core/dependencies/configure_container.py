@@ -18,6 +18,10 @@ from src.agent.prompt_templates import PromptService
 from  src.service.Redis_service import RedisService
 
 def configure_container():
+    # logs 
+    logger = Logger()
+    Container.register("logger", logger)
+    
     # core   
     email_service = EmailService()
     Container.register("email_service", email_service)
@@ -39,9 +43,6 @@ def configure_container():
         webtoken_service=webtoken_service
     )
     Container.register("http_service", http_service)
-
-    logger = Logger()
-    Container.register("logger", logger)
 
     middleware_service = MiddlewareService(
         http_service=http_service
