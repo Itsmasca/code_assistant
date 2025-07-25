@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+from pydantic.alias_generators import to_camel
 from sqlalchemy import Column, String, Text, ForeignKey
 from src.api.core.database.db_models import Base
 import uuid
@@ -10,15 +11,17 @@ class MessageCreate(BaseModel):
     text: str
 
 class MessagePublic(BaseModel):
-    messageId: uuid.UUID = Field(..., alias="message_id")
-    chatId: uuid.UUID = Field(..., alias="chat_id")
+    message_id: uuid.UUID
+    chat_id: uuid.UUID
     sender: str
     text: str
 
-    model_config = {
-        "from_attributes": True,
-        "populate_by_name": True, 
-    }
+    model_config = ConfigDict(
+        populate_by_name=True,
+        from_attributes=True,
+        serialize_by_alias=True,
+        alias_generator=to_camel
+    )
 
 class Message(Base):
     __tablename__ = "messages"

@@ -32,4 +32,4 @@ class MessagesController:
    
     @staticmethod
     def __to_public(message: Message) -> MessagePublic:
-        return MessagePublic.model_validate(message)
+        return MessagePublic.model_validate(message, from_attributes=True)

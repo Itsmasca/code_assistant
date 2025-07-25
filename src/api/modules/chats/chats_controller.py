@@ -30,8 +30,9 @@ class ChatsController:
         data = self._chats_service.collection(db=db, user_id=user.user_id)
         
         return [self.__to_public(chat) for chat in data]
-        
+              
    
     @staticmethod
-    def __to_public(message: Chat) -> ChatPublic:
-        return ChatPublic.model_validate(message, from_attributes=True, by_name=True)
+    def __to_public(chat: Chat) -> ChatPublic:
+        return ChatPublic.model_validate(chat, from_attributes=True)
+        
