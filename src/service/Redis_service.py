@@ -4,11 +4,12 @@ from typing import Any, Optional
 import os
 from dotenv import load_dotenv
 load_dotenv()
+import uuid
 
 class RedisService:
     def __init__(self):
         self.redis = redis.from_url(os.getenv("REDIS_URL"))
-
+    
     async def set_session(self, key: str, value: dict, expire_seconds: Optional[int] = 3600) -> None:
         await self.redis.set(key, json.dumps(value), ex=expire_seconds)
 
@@ -18,3 +19,6 @@ class RedisService:
 
     async def delete_session(self, key: str) -> bool:
         return await self.redis.delete(key) > 0
+    
+    def get_chat_history_key(self, chat_id: uuid.UUID):
+        return f"code_assistant_chat_history:{chat_id}"

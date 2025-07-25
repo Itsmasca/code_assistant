@@ -3,8 +3,9 @@ from sqlalchemy import Column, String, Text, ForeignKey
 from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from typing import Optional
+from typing import Optional, List
 from pydantic.alias_generators import to_camel
+from  src.api.modules.chats.messages.messages_models import Message
 
 class ChatCreate(BaseModel):
     user_id: uuid.UUID
@@ -23,6 +24,9 @@ class ChatPublic(BaseModel):
         serialize_by_alias=True,
         alias_generator=to_camel
     )
+
+class ChatSession(BaseModel):
+    chat_history: List[Message]
 
 
 class Chat(Base):

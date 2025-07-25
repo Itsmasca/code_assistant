@@ -15,6 +15,7 @@ from src.service.Qdrant import QdrantRetriever
 from src.service.Llm_service import Llmservice
 from src.api.core.services.embedding_service import EmbeddingService
 from src.agent.prompt_templates import PromptService
+from  src.service.Redis_service import RedisService
 
 def configure_container():
     # core   
@@ -27,11 +28,33 @@ def configure_container():
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
 
+    hashing_service = HashingService()
+    Container.register("hashing_service", hashing_service)
+
+    http_service = HttpService(
+        encryption_service=encryption_service,
+        logger=logger,
+        hashing_service = hashing_service,
+        request_validation_service=request_validatation_service,
+        webtoken_service=webtoken_service
+    )
+    Container.register("http_service", http_service)
+
     logger = Logger()
     Container.register("logger", logger)
 
-    hashing_service = HashingService()
-    Container.register("hashing_service", hashing_service)
+    middleware_service = MiddlewareService(
+        http_service=http_service
+    )
+    Container.register("middleware_service", middleware_service)
+
+    prompt_templates = PromptService(
+        embedding_service=embeddings_service
+    )
+    Container.register("prompt_templates", prompt_templates)
+    
+    redis_service = RedisService()
+    Container.register("redis_service", redis_service)
 
     request_validatation_service = RequestValidationService()
     Container.register("request_validation_service", request_validatation_service)
@@ -42,32 +65,13 @@ def configure_container():
     retriever_service = QdrantRetriever()
     Container.register("retriever_service", retriever_service)
 
-    prompt_templates = PromptService(
-        embedding_service=embeddings_service
-    )
-    Container.register("prompt_templates", prompt_templates)
-    
-    llm_service = Llmservice()
-    Container.register("llm_service", llm_service)
-
-    
-    http_service = HttpService(
-        encryption_service=encryption_service,
-        logger=logger,
-        hashing_service = hashing_service,
-        request_validation_service=request_validatation_service,
-        webtoken_service=webtoken_service
-    )
-    Container.register("http_service", http_service)
-
-    middleware_service = MiddlewareService(
-        http_service=http_service
-    )
-    Container.register("middleware_service", middleware_service)
-
 
     # agents 
-    configure_agents_dependencies(http_service=http_service, llm_service=llm_service)
+    configure_agents_dependencies(
+        logger=logger,
+        http_service=http_service,
+        redis_service=redis_service
+    )
 
     # chats
     configure_chats_dependencies(logger=logger, http_service=http_service)

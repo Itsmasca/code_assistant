@@ -4,13 +4,18 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 import os
 from typing import Any, List
-from src.service.Qdrant import QdrantRetriever
 from src.agent.prompt_templates import PromptService
 from src.agent.state import GraphState
+
+# chat history
 from src.api.modules.chats.messages.messages_service import MessagesService
 from src.api.modules.chats.messages.messages_models import Message
+from src.api.modules.chats.chats_models import ChatSession
 from sqlalchemy.orm import Session
+from src.service.Redis_service import RedisService
+
 import uuid
+from src.api.core.logs.logger import Logger
 from src.api.core.decorators.log_errors import log_exceptions
 # imoport copntainer 
 from src.api.core.dependencies.container import Container
@@ -26,9 +31,11 @@ class code(BaseModel):
 
 # Prompt to enforce tool use
 class Llmservice:
-    def __init__(self):
+    def __init__(self, logger: Logger, redis_service: RedisService):
         self.llm = ChatAnthropic(temperature=0.1, model="claude-opus-4-20250514", api_key= os.getenv("ANTROPHIC_API_KEY"), default_headers={"anthropic-beta": "tools-2024-04-04"}, max_tokens= 32000)  # or the maximum allowed
         self.structured_llm_claude = self.llm.with_structured_output(code, include_raw=True)
+        self._redis_service = redis_service
+        self._logger = logger
     # Optional: Check for errors in case tool use is flaky
     
     @service_error_handler(module="claude.output.error")
@@ -94,11 +101,22 @@ class Llmservice:
         code_gen_chain_no_retry = code_gen_prompt | structured_llm_claude | self.parse_output
         return code_chain_claude_raw
 
-    @staticmethod
+   
     @log_exceptions("llm_service.chat_history")
-    def get_agent_chat_history(db: Session, chat_id: uuid.UUID, num_of_messages: int = 12) -> List[Message]:
-        messages_service: MessagesService = Container.resolve("messages_service")
-        chat_history = messages_service.collection(db=db, chat_id=chat_id)
+    def get_agent_chat_history(self, db: Session, chat_id: uuid.UUID, num_of_messages: int = 12) -> List[Message]:
+        session_key = self._redis_service.get_chat_history_key(chat_id=chat_id)
+    
+        session_data = self._redis_service.get_session(session_key)
+        
+        if session_data:
+            chat_history = session_data.get("chat_history", [])
+        else:
+            messages_service: MessagesService = Container.resolve("messages_service")
+            chat_history = messages_service.collection(db=db, chat_id=chat_id)
+           
+            self._redis_service.set_session(session_key, {
+                "chat_history": chat_history
+            }, expire_seconds=7200)  # 2 hours
 
         if len(chat_history) != 0:
             return chat_history[:num_of_messages]

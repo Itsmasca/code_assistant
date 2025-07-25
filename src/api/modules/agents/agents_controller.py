@@ -11,11 +11,13 @@ import uuid
 from src.api.core.services.http_service import HttpService
 from src.api.modules.chats.chats_models import Chat
 from src.service.Llm_service import Llmservice
+from src.service.Redis_service import RedisService
 
 class AgentsController:
-    def __init__(self, https_service: HttpService, llm_service: Llmservice):
+    def __init__(self, https_service: HttpService, llm_service: Llmservice, redis_service: RedisService):
         self._http_service = https_service
         self._llm_service = llm_service
+        self._redis_service = redis_service
 
     async def prompted_code_generator(self, data: AgentRequest):
         initial_state: GraphState = {
@@ -76,7 +78,7 @@ class AgentsController:
         ai_message = final_state["final_code"]
 
         messages_service: MessagesService = Container.resolve("messages_service")
-        background_tasks.add_task(messages_service.handle_messages, db, chat_id, human_message, ai_message)
+        background_tasks.add_task(messages_service.handle_messages, db, self._redis_service, chat_id, human_message, ai_message)
         
         return { "data": final_state["final_code"]}
     

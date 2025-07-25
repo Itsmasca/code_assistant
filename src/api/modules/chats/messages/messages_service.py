@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from src.api.core.decorators.service_error_handler import service_error_handler
 from operator import attrgetter
+from src.api.core.dependencies.container import Container
+from src.service.Redis_service import RedisService
 
 class MessagesService():
     _MODULE = "messages.service"
@@ -41,7 +43,7 @@ class MessagesService():
     def delete(self, db: Session, message_id: UUID)-> Message:
         return self._repository.delete(db=db, key="message_id", value=message_id)
     
-    def handle_messages(self, db: Session, chat_id: UUID, human_message: str, ai_message: str): 
+    def handle_messages(self, db: Session, redis_service: RedisService, chat_id: UUID, human_message: str, ai_message: str, num_of_messages: int = 12): 
         incoming_message = MessageCreate(
             chat_id=chat_id,
             sender="user",
@@ -54,6 +56,23 @@ class MessagesService():
             text=ai_message
         )
 
-        return self.create_many(db=db, messages=[incoming_message, outgoing_message])
+        session_key = redis_service.get_chat_history_key(chat_id=chat_id)
+        session = redis_service.get_session(session_key)
+        chat_history = session.get("chat_history", [])
+
+        chat_history.insert(0, outgoing_message.model_dump())
+        if len(chat_history) > num_of_messages:
+            chat_history.pop()  
+
+        chat_history.insert(0, incoming_message.model_dump())
+        if len(chat_history) > num_of_messages:
+            chat_history.pop()  
+        
+        self.create_many(db=db, messages=[incoming_message, outgoing_message])
+        
+        redis_service.set_session(session_key, {
+            "chat_history": chat_history
+        }, expire_seconds=7200) #2 hours 
+    
     
     
