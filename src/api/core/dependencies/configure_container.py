@@ -18,11 +18,7 @@ from src.agent.prompt_templates import PromptService
 from  src.service.Redis_service import RedisService
 
 def configure_container():
-    # logs 
-    logger = Logger()
-    Container.register("logger", logger)
-    
-    # core   
+    # core  
     email_service = EmailService()
     Container.register("email_service", email_service)
 
@@ -32,16 +28,17 @@ def configure_container():
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
 
+    logger = Logger()
+    Container.register("logger", logger)
+
     hashing_service = HashingService()
     Container.register("hashing_service", hashing_service)
-
-    prompt_templates = PromptService(
-        embedding_service=embeddings_service
-    )
-    Container.register("prompt_templates", prompt_templates)
     
     redis_service = RedisService()
     Container.register("redis_service", redis_service)
+
+    retriever_service = QdrantRetriever()
+    Container.register("retriever_service", retriever_service)
 
     request_validatation_service = RequestValidationService()
     Container.register("request_validation_service", request_validatation_service)
@@ -49,8 +46,7 @@ def configure_container():
     webtoken_service = WebTokenService()
     Container.register("webtoken_service", webtoken_service)
 
-    retriever_service = QdrantRetriever()
-    Container.register("retriever_service", retriever_service)
+    
     
     # http 
     http_service = HttpService(
@@ -67,6 +63,14 @@ def configure_container():
     )
     Container.register("middleware_service", middleware_service)
 
+
+    # prompts 
+    prompt_templates = PromptService(
+        embedding_service=embeddings_service
+    )
+    Container.register("prompt_templates", prompt_templates)
+   
+   
     # agents 
     configure_agents_dependencies(
         logger=logger,

@@ -11,7 +11,7 @@ def configure_agents_dependencies(logger: Logger, http_service: HttpService, red
         redis_service=redis_service
     )
     
-    controller = AgentsController(https_service=http_service, llm_service=service)
+    controller = AgentsController(https_service=http_service, llm_service=service, redis_service=redis_service)
     
     Container.register("llm_service", service)
     Container.register("agents_controller", controller)
