@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Text, ForeignKey
 from src.api.core.database.db_models import Base
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from typing import Optional, List
+from typing import Optional, List, Dict
 from pydantic.alias_generators import to_camel
 from  src.api.modules.chats.messages.messages_models import Message
 
@@ -26,7 +26,7 @@ class ChatPublic(BaseModel):
     )
 
 class ChatSession(BaseModel):
-    chat_history: List[Message]
+    chat_history: List[Dict]
 
 
 class Chat(Base):
