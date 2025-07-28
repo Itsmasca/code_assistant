@@ -5,7 +5,7 @@ from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
 from src.api.modules.chats.chats_controller import ChatsController
-from src.api.modules.chats.chats_models import ChatPublic
+from src.api.modules.chats.chats_models import ChatPublic, ChatCreateResposne
 from src.api.core.middleware.middleware_service import security
 import uuid
 
@@ -19,7 +19,7 @@ router = APIRouter(
 def get_controller() -> ChatsController:
     return Container.resolve("chats_controller")
 
-@router.post("/secure/create", status_code=201, response_model=({"chatId": str}))
+@router.post("/secure/create", status_code=201, response_model=ChatCreateResposne)
 def secure_create(
     request: Request,
     _=Depends(auth_middleware),
@@ -33,7 +33,7 @@ def secure_create(
     The id returned is needed for all requests to the llm.
     No request body is needed but can be added.
 
-    - **tile**: optional string for chat identification.
+    - **title**: optional string for chat identification.
     - **Resposne**: chatId needed for  llm  interactions.
 
     """

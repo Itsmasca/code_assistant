@@ -27,6 +27,9 @@ class ChatPublic(BaseModel):
 class ChatSession(BaseModel):
     chat_history: List[Dict]
 
+class ChatCreateResposne(BaseModel):
+    chatId: uuid.UUID
+
 
 class Chat(Base):
     __tablename__ = "chats"
