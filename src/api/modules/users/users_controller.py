@@ -1,5 +1,6 @@
 from src.api.modules.users.users_service import UsersService
-from src.api.modules.users.users_models import UserCreate, User, UserUpdate, UserLogin
+from src.api.modules.users.users_models import UserCreate, LoginResponse, UserPublic, User, UserUpdate, UserLogin, VerifyEmailResponse
+from src.api.core.models.http_responses import  ResponseWithDetail
 from fastapi import Request, HTTPException
 from src.api.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
@@ -13,7 +14,7 @@ class UsersController:
         self._module = "users.controller"
 
 
-    def verify_email(self, request: Request, db: Session, email: str):
+    def verify_email(self, request: Request, db: Session, email: str) -> VerifyEmailResponse:
         print("In Verified email")
         hashed_email = self._http_service.hashing_service.hash_for_search(data=email)
         
@@ -25,14 +26,14 @@ class UsersController:
         email_service: EmailService = Container.resolve("email_service")
         token = email_service.handle_request(email, "NEW", self._http_service.webtoken_service)
 
-        return {
-            "detail": "Email sent",
-            "token": token
-        }
+        return VerifyEmailResponse(
+            detail="Email sent.",
+            token=token
+        )
         
         
 
-    def create_request(self, request: Request, db: Session, new_user: UserCreate):
+    def create_request(self, request: Request, db: Session, new_user: UserCreate) -> ResponseWithDetail:
         verification_code = request.state.verification_code
 
         if new_user.code != verification_code:
@@ -51,11 +52,13 @@ class UsersController:
         
         self._users_service.create(db=db, user=user_data)
         
-        return {"detail": "User created"}
+        return ResponseWithDetail(
+            detail="User created"
+        )
     
 
     
-    def resource_request(self, request: Request):
+    def resource_request(self, request: Request) -> UserPublic:
         user: User = request.state.user
 
         data = self._users_service.map_from_db(user=user)
@@ -63,7 +66,7 @@ class UsersController:
         return data
         
 
-    def update_request(self, request: Request, db: Session, data: UserUpdate):
+    def update_request(self, request: Request, db: Session, data: UserUpdate) -> ResponseWithDetail:
         user: User = request.state.user 
 
         self._http_service.hashing_service.compare_password(data.oldPassword, user.password)
@@ -76,9 +79,11 @@ class UsersController:
             changes={"password": hashed_password}
         )
 
-        return {"detail": "User updated"}
+        return ResponseWithDetail(
+            detail="User updated"
+        )
 
-    def delete_request(self, request: Request, db: Session):
+    def delete_request(self, request: Request, db: Session) -> ResponseWithDetail:
         user: User = request.state.user
 
         self._users_service.delete(
@@ -86,9 +91,11 @@ class UsersController:
             user_id=user.user_id
         )
 
-        return {"detail": "User deleted"}
+        return ResponseWithDetail(
+            detail="User deleted"
+        )
     
-    def login(self, request: Request, db: Session, data: UserLogin): 
+    def login(self, request: Request, db: Session, data: UserLogin) -> LoginResponse: 
         hashed_email = self._http_service.hashing_service.hash_for_search(data=data.email)
         
         user: User = self._http_service.request_validation_service.verify_resource(
@@ -103,5 +110,7 @@ class UsersController:
             "user_id": str(user.user_id)
         }, "7d")
 
-        return {"token": token}
+        return LoginResponse(
+            token=token
+        )
 

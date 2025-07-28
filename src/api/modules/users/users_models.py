@@ -31,7 +31,12 @@ class UserToDB(BaseModel):
     password: str
     code: int
     
+class VerifyEmailResponse(BaseModel):
+    detail: str
+    token: str
 
+class LoginResponse(BaseModel):
+    token: str
 
 class User(Base):
     __tablename__ = "users"
