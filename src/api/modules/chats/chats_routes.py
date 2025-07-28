@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Body, Request
 from src.api.core.dependencies.container import Container
-from typing import List
+from typing import List, Dict
 from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
@@ -19,7 +19,7 @@ router = APIRouter(
 def get_controller() -> ChatsController:
     return Container.resolve("chats_controller")
 
-@router.post("/secure/create", status_code=201)
+@router.post("/secure/create", status_code=201, response_model=({"chatId": str}))
 def secure_create(
     request: Request,
     _=Depends(auth_middleware),
