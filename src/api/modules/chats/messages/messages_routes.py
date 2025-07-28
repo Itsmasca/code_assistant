@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
 from src.api.modules.chats.messages.messages_controller import MessagesController
 from src.api.core.middleware.middleware_service import security
+from src.api.modules.chats.messages.messages_models import MessagePublic
 import uuid
 
 
@@ -18,7 +19,7 @@ router = APIRouter(
 def get_controller():
     return Container.resolve("messages_controller")
 
-@router.get("/secure/collection/{chat_id}", status_code=200)
+@router.get("/secure/collection/{chat_id}", status_code=200, response_model=List[MessagePublic])
 async def secure_collection( 
     chat_id: uuid.UUID,
     request: Request,

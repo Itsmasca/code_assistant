@@ -26,6 +26,17 @@ def secure_create(
     db: Session = Depends(get_db_session),
     controller: ChatsController = Depends(get_controller)
 ):
+    """
+    ## Chat create request
+
+    This endpoint creates a chat in the database.
+    The id returned is needed for all requests to the llm.
+    No request body is needed but can be added.
+
+    - **tile**: optional string for chat identification.
+    - **Resposne**: chatId needed for  llm  interactions.
+
+    """
     return controller.create_request(request=request, db=db)
 
 @router.get("/secure/collection", status_code=200, response_model=List[ChatPublic])
