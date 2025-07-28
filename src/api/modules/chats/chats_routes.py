@@ -46,6 +46,11 @@ def secure_collection(
     db: Session = Depends(get_db_session),
     controller: ChatsController = Depends(get_controller)
 ):
+    """
+    ## Chat collection request
+
+    This endpoint returns a list of chats by the user id in the auth token.
+    """
     return controller.collection_request(request=request, db=db)
 
 
