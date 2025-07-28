@@ -35,7 +35,7 @@ def secure_create(
     No request body is needed but can be added.
 
     - **title**: optional string for chat identification.
-    - **Resposne**: chatId needed for  llm  interactions.
+    - **Resposne**: chatId needed for llm interactions.
 
     """
     return controller.create_request(request=request, db=db)
