@@ -29,11 +29,11 @@ def configure_container():
     encryption_service = EncryptionService()
     Container.register("encryption_service", encryption_service)
 
-    logger = Logger()
-    Container.register("logger", logger)
-
     hashing_service = HashingService()
     Container.register("hashing_service", hashing_service)
+
+    logger = Logger()
+    Container.register("logger", logger)
     
     redis_service = RedisService()
     Container.register("redis_service", redis_service)

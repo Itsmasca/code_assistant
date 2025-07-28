@@ -19,13 +19,18 @@ def get_controller():
     return Container.resolve("messages_controller")
 
 @router.get("/secure/collection/{chat_id}", status_code=200)
-async def generate_code( 
+async def secure_collection( 
     chat_id: uuid.UUID,
     request: Request,
     _=Depends(auth_middleware), 
     db: Session = Depends(get_db_session),
     controller: MessagesController = Depends(get_controller)
 ):
+    """
+    ## Messages collection  request
+
+    This endpoint returns a list of messages associated with the chat id passed in the params
+    """
     return await controller.collection_request(request=request, db=db, chat_id=chat_id)
 
 
