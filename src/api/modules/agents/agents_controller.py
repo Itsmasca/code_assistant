@@ -67,7 +67,7 @@ class AgentsController:
 
         state: GenerateCodeState =  {
             "input": data.input,
-            "chat_histroty": chat_history, 
+            "chat_history": chat_history, 
             "generated_code": None,
             "final_code": None
         }
