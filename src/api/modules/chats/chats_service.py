@@ -1,4 +1,4 @@
-from src.api.modules.chats.chats_models import Chat, ChatCreate
+from src.api.modules.chats.chats_models import Chat, ChatCreate, ChatUpdate
 from src.api.core.repository.base_repository import BaseRepository
 import logging
 from src.api.core.logs.logger import Logger
@@ -33,8 +33,8 @@ class ChatsService():
         return []
     
     @service_error_handler(module=_MODULE)
-    def update(self, db: Session, chat_id: UUID, changes: Dict[str, Any]) -> Chat:
-        return self._repository.update(db=db, key="chat_id", value=chat_id, changes=changes)
+    def update(self, db: Session, chat_id: UUID, changes: ChatUpdate) -> Chat:
+        return self._repository.update(db=db, key="chat_id", value=chat_id, changes=changes.model_dump())
 
     @service_error_handler(module=_MODULE)
     def delete(self, db: Session, chat_id: UUID)-> Chat:

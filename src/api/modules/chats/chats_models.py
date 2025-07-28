@@ -13,7 +13,7 @@ class ChatCreate(BaseModel):
 
 ## Update a chat ##
 class ChatUpdate(BaseModel):
-    title: uuid.UUID
+    title: str
 
 ## Camel case chat for frontend use ##
 class ChatPublic(BaseModel):

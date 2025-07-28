@@ -5,7 +5,8 @@ from src.api.core.middleware.auth_middleware import auth_middleware
 from sqlalchemy.orm import Session
 from src.api.core.database.sessions import get_db_session
 from src.api.modules.chats.chats_controller import ChatsController
-from src.api.modules.chats.chats_models import ChatPublic, ChatCreateResposne
+from src.api.modules.chats.chats_models import ChatPublic, ChatCreateResposne, ChatUpdate
+from src.api.core.models.http_responses import ResponseWithDetail
 from src.api.core.middleware.middleware_service import security
 import uuid
 
@@ -54,5 +55,24 @@ def secure_collection(
     return controller.collection_request(request=request, db=db)
 
 
-    
+@router.put("/secure/update/{chat_id}", status_code=200, response_model=ResponseWithDetail)
+def secure_update(
+    chat_id: uuid.UUID,
+    data: ChatUpdate,
+    request: Request,
+    _=Depends(auth_middleware),
+    db: Session = Depends(get_db_session),
+    controller: ChatsController = Depends(get_controller)
+): 
+    """
+    ## Update request
 
+    This endpont updates the title of the chat provided in the params
+    """
+    return controller.update_request(
+        request=request,
+        db=db,
+        data=data,
+        chat_id=chat_id
+    )
+    

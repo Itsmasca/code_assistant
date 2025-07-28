@@ -51,3 +51,13 @@ def test_collection():
         print(response.json(), "RES::::")
         assert response.status_code == 200
 
+def test_update():
+    with TestClient(app) as client:
+        res = client.put("/chats/secure/update/6d26b81a-1aad-457f-9921-68c24edeb2a1",
+            headers=get_auth_headers(),
+            json={
+                "title": "Upadated title"
+            }
+        )
+
+        assert(res.status_code == 200)

@@ -1,6 +1,6 @@
 # app/repositories/base_repository.py
 from sqlalchemy.orm import Session
-from typing import TypeVar, Generic, Type, List, Optional
+from typing import TypeVar, Generic, Type, List, Optional, Dict, Any
 from sqlalchemy import select, update, delete
 import uuid
 
@@ -28,7 +28,7 @@ class BaseRepository(Generic[T]):
         
         return db.execute(stmt).scalars().all()
 
-    def update(self, db: Session,  key: str, value: str | uuid.UUID, changes: dict) -> Optional[T]:
+    def update(self, db: Session,  key: str, value: str | uuid.UUID, changes: Dict[str, Any]) -> Optional[T]:
         stmt = update(self.model).where(getattr(self.model, key) == value).values(**changes).returning(*self.model.__table__.c)
         result = db.execute(stmt)
         db.commit()
