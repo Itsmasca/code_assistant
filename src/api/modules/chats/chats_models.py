@@ -6,12 +6,16 @@ from sqlalchemy.dialects.postgresql import UUID
 from typing import Optional, List, Dict
 from pydantic.alias_generators import to_camel
 
+## Create a new chat ##
 class ChatCreate(BaseModel):
     user_id: uuid.UUID
 
+
+## Update a chat ##
 class ChatUpdate(BaseModel):
     title: uuid.UUID
 
+## Camel case chat for frontend use ##
 class ChatPublic(BaseModel):
     chat_id: uuid.UUID
     user_id: uuid.UUID
@@ -21,12 +25,13 @@ class ChatPublic(BaseModel):
         populate_by_name=True,
         from_attributes=True,
         serialize_by_alias=True,
-        alias_generator=to_camel
+        alias_generator=to_camel 
     )
 
 class ChatSession(BaseModel):
     chat_history: List[Dict]
 
+## Response to front end on successfull insert request ##
 class ChatCreateResposne(BaseModel):
     chatId: uuid.UUID
 

@@ -6,7 +6,10 @@ from src.api.core.repository.base_repository import BaseRepository
 from src.api.core.services.http_service import HttpService
 from src.api.core.logs.logger import Logger
 
-def configure_chats_dependencies(logger: Logger, http_service: HttpService):
+def configure_chats_dependencies(logger: Logger, http_service: HttpService) -> None:
+    """
+    This function registers all necessary dependencies for the chats module.
+    """
     repository = BaseRepository(Chat)
     service = ChatsService(logger=logger, repository=repository)
     controller = ChatsController(https_service=http_service, chats_service=service)

@@ -1,10 +1,11 @@
 from src.api.modules.chats.chats_models import Chat, ChatPublic
 from src.api.modules.users.users_models import User
 from src.api.modules.chats.chats_service import ChatsService
-from src.api.modules.chats.chats_models import  Chat, ChatCreate
+from src.api.modules.chats.chats_models import  Chat, ChatCreate, ChatCreateResposne
 from fastapi import Request
 from src.api.core.services.http_service import HttpService
 from sqlalchemy.orm import Session
+from typing import List
 import uuid
 from src.api.modules.users.users_models import User
 
@@ -15,16 +16,18 @@ class ChatsController:
         self._chats_service = chats_service
         self._module = "chats.controller"
 
-    def create_request(self, request: Request, db: Session):
+    def create_request(self, request: Request, db: Session) -> ChatCreateResposne:
         user: User = request.state.user
 
         chat = self._chats_service.create(db=db, chat=ChatCreate(
             user_id=user.user_id
         ))
 
-        return chat.chat_id
+        return ChatCreateResposne(
+            chatId=chat.chat_id
+        )
  
-    def collection_request(self, request: Request, db: Session):
+    def collection_request(self, request: Request, db: Session) -> List[ChatPublic]:
         user: User = request.state.user
 
         data = self._chats_service.collection(db=db, user_id=user.user_id)
