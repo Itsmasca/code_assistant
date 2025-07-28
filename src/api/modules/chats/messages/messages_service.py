@@ -30,7 +30,6 @@ class MessagesService():
     @service_error_handler(module=_MODULE)
     def collection(self, db: Session, chat_id: UUID) -> List[Message]:
         result = self._repository.get_many(db=db, key="chat_id", value=chat_id)
-
         if len(result) != 0:
             return sorted(result, key=attrgetter("created_at"), reverse=True)
         return []

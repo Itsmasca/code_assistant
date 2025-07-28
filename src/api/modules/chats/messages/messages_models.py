@@ -16,7 +16,7 @@ class MessagePublic(BaseModel):
     chat_id: uuid.UUID
     sender: str
     text: str
-    create_at: datetime
+    created_at: datetime
 
     model_config = ConfigDict(
         populate_by_name=True,

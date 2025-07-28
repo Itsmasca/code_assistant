@@ -25,7 +25,7 @@ class MessagesController:
     
         self._http_service.request_validation_service.validate_action_authorization(user.user_id, chat_resource.user_id)
         
-        data = self._messages_service.collection(chat_id=chat_resource.chat_id)
+        data = self._messages_service.collection(db=db, chat_id=chat_resource.chat_id)
 
         return [self.__to_public(message) for message in data]
         
